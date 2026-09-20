@@ -1,0 +1,54 @@
+/* ============================================================
+   RESPONSIVE.CSS - Wide & Compact Mobile Dropdown
+   ============================================================ */
+
+@media (max-width: 991.98px) {
+  .hero-container {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .profile-card {
+    max-width: 200px;
+  }
+
+  /* Dropdown Menu Mengambang (Melebar Kanan-Kiri & Tinggi Ringkas) */
+  .navbar-collapse {
+    position: absolute;
+    top: 100%;
+    left: 5%;
+    right: 5%;
+    background: rgba(255, 255, 255, 0.85) !important; /* Semi-transparan */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: 0.8rem 1rem;                          /* Jarak atas-bawah tipis */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    z-index: 999;
+  }
+
+  .navbar-nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.35rem;                                 /* Jarak antar menu lebih rapat */
+  }
+
+  .navbar-nav .nav-link {
+    color: #0f172a !important;
+    font-size: 0.9rem;
+    padding: 0.2rem 0;
+  }
+
+.navbar-nav .btn-nav {
+  width: auto;                  /* Lebar tombol otomatis mengikuti panjang teks */
+  min-width: 160px;             /* Lebar minimal tombol */
+  white-space: nowrap;          /* Mencegah teks tertekuk jadi 2 baris */
+  font-size: 0.85rem;
+  padding: 0.45rem 1.2rem;
+  margin-top: 0.3rem;
+  display: inline-block;
+}
+}

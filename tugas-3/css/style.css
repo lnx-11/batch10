@@ -1,0 +1,179 @@
+/* ============================================================
+   STYLE.CSS - Theme Colors, Brand Logo & Card Styling
+   ============================================================ */
+
+:root {
+  --primary: #4f46e5;       
+  --primary-hover: #4338ca;
+  --accent: #06b6d4;        
+  --dark: #0f172a;          
+  --bg-light: #f8fafc;      
+  --border-color: #e2e8f0;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--dark);
+  padding-top: 70px;
+  background-color: #ffffff;
+}
+
+h1, h2, h3, .logo {
+  font-family: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.bg-light-custom {
+  background-color: var(--bg-light);
+}
+
+.highlight { 
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Aturan Teks Rata Kanan-Kiri */
+.text-justify {
+  text-align: justify;
+}
+
+/* Logo Brand di Navbar */
+.brand-logo {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  display: inline-block;
+}
+
+/* Badge & Tag Styles */
+.badge-hero {
+  background-color: #e0e7ff;
+  color: var(--primary);
+  font-size: 0.85rem;
+}
+
+.card-tag {
+  background-color: #f1f5f9;
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.3rem 0.6rem;
+}
+
+.company-name {
+  font-size: 0.85rem;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.skill-pill {
+  background: #f1f5f9;
+  color: var(--dark);
+  padding: 0.35rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid var(--border-color);
+}
+
+/* Responsive Cards Fix */
+.exp-card {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.exp-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Bullet List Pengalaman */
+.exp-bullet-list {
+  list-style: none;
+}
+
+.exp-bullet-list li {
+  position: relative;
+  padding-left: 1.2rem;
+  margin-bottom: 0.4rem;
+  text-align: justify;
+}
+
+.exp-bullet-list li::before {
+  content: "•";
+  color: var(--primary);
+  font-weight: bold;
+  font-size: 1.1rem;
+  position: absolute;
+  left: 0;
+  top: -2px;
+}
+
+/* Contact Card Berlatar Putih */
+.contact-card {
+  width: 100%;
+  background: #ffffff !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+/* Style Tombol-Tombol Kontak */
+.btn-contact {
+  background: #ffffff;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+}
+
+/* 1. Tombol Kirim Email (Ungu Solid) */
+.btn-email {
+  border: 2px solid #4f46e5;
+  background-color: #4f46e5;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+}
+
+.btn-email:hover {
+  background-color: #4338ca;
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+/* 2. Tombol LinkedIn (Outline Dark) */
+.btn-linkedin {
+  border: 2px solid #e2e8f0;
+  color: #0f172a;
+}
+
+.btn-linkedin:hover {
+  border-color: #0f172a;
+  background-color: #0f172a;
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+/* 3. Tombol WhatsApp (Outline Hijau) */
+.btn-whatsapp {
+  border: 2px solid #25d366;
+  color: #25d366;
+}
+
+.btn-whatsapp:hover {
+  background-color: #25d366;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25);
+}
+
+/* Image Protection Overlay */
+.img-protection-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  background: transparent;
+}
