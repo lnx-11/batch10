@@ -2,7 +2,7 @@
 
 ## Tugas 1 - Fundamental Git, HTML dan AI
 ## Tugas 2 - Mastering CSS & AI Stylling
-## Tugas 2 - Responsive Magic with Boostrap
+## Tugas 3 - Responsive Magic with Boostrap
 
 
 
