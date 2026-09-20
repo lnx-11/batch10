@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portofolio | Moh. Alfian Nugroho</title>
+
+  <!-- Google Fonts & Font Awesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Bootstrap 5 CSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom CSS Files -->
+  <link rel="stylesheet" href="css/grid.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <link rel="icon" type="image/jpeg" href="assets/icon/logo.jpg">
+</head>
+<body data-bs-spy="scroll" data-bs-target="#navbar-main">
+
+  <!-- NAVBAR -->
+  <!-- Ubah bg-white menjadi bg-body (atau hilangkan bg-white) agar CSS kustom bekerja -->
+<nav id="navbar-main" class="navbar navbar-expand-lg fixed-top bg-white border-bottom py-3">
+    <div class="container">
+      <a class="navbar-brand logo fw-bold fs-4 text-dark d-flex align-items-center gap-2" href="#">
+  <img src="assets/icon/logo.jpg" alt="Logo LNX" class="brand-logo rounded-2">
+  <span>LИX<span class="dot text-primary">.</span>DEV</span>
+    </a>
+      
+      <!-- Tombol Hamburger -->
+      <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navMenu">
+  <!-- Tambahkan text-center dan align-items-center agar isinya ke tengah di HP -->
+  <ul class="navbar-nav ms-auto text-center align-items-center gap-lg-3">
+    <li class="nav-item"><a class="nav-link fw-semibold" href="#tentang">Tentang</a></li>
+    <li class="nav-item"><a class="nav-link fw-semibold" href="#pengalaman">Pengalaman</a></li>
+    <li class="nav-item"><a class="nav-link fw-semibold" href="#keahlian">Keahlian</a></li>
+    <li class="nav-item"><a class="nav-link fw-semibold" href="#pendidikan">Pendidikan</a></li>
+    <li class="nav-item mt-3 mt-lg-0">
+      <a href="#kontak" class="btn btn-dark btn-nav px-4 rounded-3 fw-semibold">Let's Connect</a>
+    </li>
+  </ul>
+</div>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section id="tentang" class="hero-container py-5">
+    <div class="container">
+      <div class="row align-items-center gy-4">
+        
+        <!-- Foto Profil (order-1 di mobile agar tampil di atas, order-lg-2 di desktop) -->
+        <div class="col-lg-5 text-center order-1 order-lg-2">
+          <div class="profile-card position-relative mx-auto">
+            <div class="img-protection-overlay"></div> 
+            <img src="assets/images/profil.png" alt="Moh. Alfian Nugroho" class="img-fluid rounded-4 shadow-sm" draggable="false">
+          </div>
+        </div>
+
+        <!-- Teks Hero -->
+<div class="col-lg-7 text-center text-lg-start order-2 order-lg-1">
+  <span class="badge badge-hero mb-3 px-3 py-2 rounded-pill fw-bold">🚀 Ready to Innovate</span>
+  <h1 class="display-5 fw-extrabold mb-2">
+    Hi, I'm <span class="highlight">Moh. Alfian Nugroho</span>
+  </h1>
+  <h2 class="h4 fw-bold text-secondary mb-3">Project Administrator & IT Specialist</h2>
+  
+  <!-- Ditambahkan class text-justify di bawah ini -->
+  <p class="text-muted lead-custom mb-4 text-justify">
+    Lulusan S1 Informatika dengan pengalaman di bidang administrasi, manajemen data, dan operasional. Memiliki rekam jejak yang kuat dalam entri data, tata kelola dokumen, serta pemeliharaan sistem informasi. Memanfaatkan pemahaman teknologi (IT) untuk mengoptimalkan efisiensi alur kerja administratif dan pelaporan operasional perusahaan.
+  </p>
+  
+  <div class="d-flex flex-column flex-sm-row justify-content-center justify-content-lg-start gap-3">
+    <a href="#pengalaman" class="btn btn-primary btn-lg px-4 rounded-3 fw-semibold shadow-sm">Examine Work</a>
+  </div>
+</div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- PENGALAMAN KERJA SECTION -->
+  <section id="pengalaman" class="py-5 bg-light-custom">
+    <div class="container py-4">
+      <div class="text-center mb-5">
+        <h2 class="section-title fw-bold">Pengalaman Kerja</h2>
+        <p class="text-muted">Rekam jejak kontribusi profesional dan operasional.</p>
+      </div>
+
+      <div class="row g-4">
+        <!-- Kartu 1 -->
+        <div class="col-md-6 col-lg-4">
+          <div class="card exp-card border-0 shadow-sm h-100 rounded-4">
+            <div class="card-body p-4 d-flex flex-column justify-content-between">
+              <div>
+                <span class="card-tag badge mb-3">Full-time</span>
+                <h5 class="fw-bold mb-1">Admin Proyek</h5>
+                <p class="company-name mb-3">PT Kian Santang Muliatama Tbk</p>
+                <p class="text-muted small">Mengelola dokumen proyek, verifikasi laporan, dan pengarsipan data secara akurat.</p>
+              </div>
+              <button class="btn btn-outline-primary btn-sm rounded-pill w-100 fw-semibold mt-3" data-bs-toggle="modal" data-bs-target="#modalExp1">
+                Detail Pekerjaan
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kartu 2 -->
+        <div class="col-md-6 col-lg-4">
+          <div class="card exp-card border-0 shadow-sm h-100 rounded-4">
+            <div class="card-body p-4 d-flex flex-column justify-content-between">
+              <div>
+                <span class="card-tag badge mb-3">Operations</span>
+                <h5 class="fw-bold mb-1">Administrasi & Operasional</h5>
+                <p class="company-name mb-3">Yayasan Kemandirian Perkoperasian Indonesia</p>
+                <p class="text-muted small">Menyusun laporan operasional dan mengoptimalkan pengarsipan dokumen kantor.</p>
+              </div>
+              <button class="btn btn-outline-primary btn-sm rounded-pill w-100 fw-semibold mt-3" data-bs-toggle="modal" data-bs-target="#modalExp2">
+                Detail Pekerjaan
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kartu 3 -->
+        <div class="col-md-6 col-lg-4">
+          <div class="card exp-card border-0 shadow-sm h-100 rounded-4">
+            <div class="card-body p-4 d-flex flex-column justify-content-between">
+              <div>
+                <span class="card-tag badge mb-3">Data</span>
+                <h5 class="fw-bold mb-1">Tenaga Entry Data</h5>
+                <p class="company-name mb-3">PT Geosoftwin</p>
+                <p class="text-muted small">Verifikasi dokumen fisik dan pemrosesan entri data ke sistem basis data perusahaan.</p>
+              </div>
+              <button class="btn btn-outline-primary btn-sm rounded-pill w-100 fw-semibold mt-3" data-bs-toggle="modal" data-bs-target="#modalExp3">
+                Detail Pekerjaan
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kartu 4 -->
+        <div class="col-md-6 col-lg-4">
+          <div class="card exp-card border-0 shadow-sm h-100 rounded-4">
+            <div class="card-body p-4 d-flex flex-column justify-content-between">
+              <div>
+                <span class="card-tag badge mb-3">E-Commerce</span>
+                <h5 class="fw-bold mb-1">Admin Store</h5>
+                <p class="company-name mb-3">Thufail Official</p>
+                <p class="text-muted small">Laporan rekapitulasi bulanan serta memonitor pesanan e-commerce.</p>
+              </div>
+              <button class="btn btn-outline-primary btn-sm rounded-pill w-100 fw-semibold mt-3" data-bs-toggle="modal" data-bs-target="#modalExp4">
+                Detail Pekerjaan
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kartu 5 -->
+        <div class="col-md-6 col-lg-4">
+          <div class="card exp-card border-0 shadow-sm h-100 rounded-4">
+            <div class="card-body p-4 d-flex flex-column justify-content-between">
+              <div>
+                <span class="card-tag badge mb-3">IT & Tech</span>
+                <h5 class="fw-bold mb-1">IT Support</h5>
+                <p class="company-name mb-3">PT Pismatex Pekalongan</p>
+                <p class="text-muted small">Pemeliharaan hardware, pemeliharaan jaringan, dan perbaikan perangkat keras dasar.</p>
+              </div>
+              <button class="btn btn-outline-primary btn-sm rounded-pill w-100 fw-semibold mt-3" data-bs-toggle="modal" data-bs-target="#modalExp5">
+                Detail Pekerjaan
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- POPUP MODALS -->
+  <!-- Modal 1 -->
+  <div class="modal fade" id="modalExp1" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0 shadow">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold">Admin Proyek — PT Kian Santang Muliatama Tbk</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <ul class="exp-bullet-list text-muted ps-0 mb-0">
+            <li>Memverifikasi laporan harian dari tim lapangan dan menginput data progres secara real-time.</li>
+            <li>Mengarsipkan dokumen arus informasi secara sistematis untuk mendukung evaluasi operasional proyek.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2 -->
+  <div class="modal fade" id="modalExp2" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0 shadow">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold">Administrasi & Operasional — Yayasan Kemandirian Perkoperasian Indonesia</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <ul class="exp-bullet-list text-muted ps-0 mb-0">
+            <li>Menyusun laporan operasional berkala untuk kelancaran tata kelola Yayasan.</li>
+            <li>Mengoptimalkan sistem pengarsipan dokumen fisik dan digital guna meningkatkan efisiensi pencarian data.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3 -->
+  <div class="modal fade" id="modalExp3" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0 shadow">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold">Tenaga Entry Data — PT Geosoftwin</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <ul class="exp-bullet-list text-muted ps-0 mb-0">
+            <li>Memverifikasi silang dokumen fisik ke format digital untuk menjaga integritas data.</li>
+            <li>Memproses entri data ke database perusahaan dengan akurasi dan kecepatan tinggi.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4 -->
+  <div class="modal fade" id="modalExp4" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0 shadow">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold">Admin Store — Thufail Official</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <ul class="exp-bullet-list text-muted ps-0 mb-0">
+            <li>Membuat laporan rekapitulasi dan evaluasi kinerja bulanan secara terstruktur.</li>
+            <li>Memonitor pesanan masuk dan memberikan pelayanan pelanggan yang responsif di platform e-commerce.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 5 -->
+  <div class="modal fade" id="modalExp5" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0 shadow">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold">IT Support — PT Pismatex Pekalongan</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <ul class="exp-bullet-list text-muted ps-0 mb-0">
+            <li>Mendukung pemeliharaan hardware dan jaringan komputer karyawan untuk kelancaran operasional.</li>
+            <li>Melakukan perbaikan masalah teknis (troubleshooting) perangkat keras dasar staf kantor.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KEAHLIAN UTAMA SECTION -->
+  <section id="keahlian" class="py-5">
+    <div class="container py-4">
+      <div class="text-center mb-5">
+        <h2 class="section-title fw-bold">Keahlian Utama</h2>
+        <p class="text-muted">Kombinasi Tech Stack, Tools, dan Soft Skills.</p>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="card exp-card border-0 shadow-sm h-100 rounded-4 overflow-hidden">
+            <img src="assets/images/porto1.png" class="card-img-top" alt="Administrasi & Data">
+            <div class="card-body p-4">
+              <h5 class="fw-bold mb-3">Administrasi & Data</h5>
+              <div class="d-flex flex-wrap gap-2">
+                <span class="skill-pill">Data Entry</span>
+                <span class="skill-pill">Project Admin</span>
+                <span class="skill-pill">Digital Archiving</span>
+                <span class="skill-pill">Operasional</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card exp-card border-0 shadow-sm h-100 rounded-4 overflow-hidden">
+            <img src="assets/images/porto2.png" class="card-img-top" alt="Aplikasi & Tools">
+            <div class="card-body p-4">
+              <h5 class="fw-bold mb-3">Aplikasi & Tools</h5>
+              <div class="d-flex flex-wrap gap-2">
+                <span class="skill-pill">MS Office</span>
+                <span class="skill-pill">UI Design</span>
+                <span class="skill-pill">Canva</span>
+                <span class="skill-pill">Basic Editing</span>
+                <span class="skill-pill">Basic Coding</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card exp-card border-0 shadow-sm h-100 rounded-4 overflow-hidden">
+            <img src="assets/images/porto3.png" class="card-img-top" alt="Soft Skills">
+            <div class="card-body p-4">
+              <h5 class="fw-bold mb-3">Soft Skills</h5>
+              <div class="d-flex flex-wrap gap-2">
+                <span class="skill-pill">Leadership</span>
+                <span class="skill-pill">Teamwork</span>
+                <span class="skill-pill">Effective Comm</span>
+                <span class="skill-pill">Adaptive</span>
+                <span class="skill-pill">Detail-Oriented</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PENDIDIKAN & ORGANISASI SECTION -->
+  <section id="pendidikan" class="py-5 bg-light-custom">
+    <div class="container py-4">
+      <div class="text-center mb-5">
+        <h2 class="section-title fw-bold">Pendidikan & Organisasi</h2>
+        <p class="text-muted">Jejak Akademis & Pengalaman Organisasi.</p>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="card exp-card border-0 shadow-sm h-100 p-4 rounded-4">
+            <span class="badge bg-success-subtle text-success fw-bold align-self-start mb-2 px-3 py-2">IPK 3.50</span>
+            <h5 class="fw-bold mb-1">S1 Informatika</h5>
+            <p class="company-name mb-3">ITSNU Pekalongan (2019 - 2023)</p>
+            <hr class="my-3">
+            <h5 class="fw-bold mb-1">Teknik Kendaraan Ringan</h5>
+            <p class="company-name mb-0">SMK Islamiyyah Sapugarut (2016 - 2019)</p>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card exp-card border-0 shadow-sm h-100 p-4 rounded-4">
+            <h5 class="fw-bold mb-3">Pengalaman Organisasi</h5>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0">
+                <span><strong>Wakil Ketua</strong> - UKM Sport</span>
+                <span class="badge bg-light text-dark border">2021–2022</span>
+              </li>
+              <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0">
+                <span><strong>Ketua Divisi Futsal</strong> - UKM Sport</span>
+                <span class="badge bg-light text-dark border">2019–2021</span>
+              </li>
+              <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0">
+                <span><strong>Ketua Divisi ML</strong> - UKM Saga E-Sports</span>
+                <span class="badge bg-light text-dark border">2019–2021</span>
+              </li>
+              <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0">
+                <span><strong>Dewan Ambalan</strong> - SMK Islamiyyah</span>
+                <span class="badge bg-light text-dark border">2017–2018</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- POPUP MODALS (Sesuai Aturan Tugas 3) -->
+  <div class="modal fade" id="modalExp1" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0 shadow">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold">Admin Proyek — PT Kian Santang Muliatama Tbk</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted">Memverifikasi laporan harian dari tim lapangan, menginput data progres proyek ke dalam sistem secara real-time dan akurat, serta mengarsipkan dokumen arus informasi secara sistematis untuk mendukung kebutuhan evaluasi operasional.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalExp2" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0 shadow">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold">Administrasi & Operasional — YKPI</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted">Menyusun laporan operasional berkala dan memfasilitasi kelancaran tata kelola Administrasi Yayasan serta mengoptimalkan sistem pengarsipan dokumen fisik maupun digital untuk efisiensi pencarian data.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalExp3" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0 shadow">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold">Tenaga Entry Data — PT Geosoftwin</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted">Memverifikasi silang dokumen fisik ke format digital untuk menjaga keaslian data serta memproses entri data ke dalam sistem basis data perusahaan dengan target waktu yang cepat dan tingkat akurasi tinggi.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalExp4" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0 shadow">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold">Admin Store — Thufail Official</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted">Membuat laporan rekapitulasi dan evaluasi kinerja bulanan secara terstruktur agar mudah dipantau oleh manajemen, serta memberikan pelayanan pelanggan yang responsif melalui e-commerce.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalExp5" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0 shadow">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold">IT Support — PT Pismatex Pekalongan</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted">Mendukung pemeliharaan hardware dan jaringan komputer karyawan untuk memastikan kelancaran operasional administrasi perusahaan serta melakukan perbaikan masalah teknis (troubleshooting) perangkat keras dasar.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTACT SECTION -->
+  <section id="kontak" class="py-5 bg-light-custom">
+    <div class="container py-4 text-center">
+      <div class="card contact-card border-0 rounded-4 p-4 p-md-5 shadow mx-auto" style="max-width: 650px;">
+        <h2 class="fw-bold mb-2 text-dark">Mari Berkolaborasi! <i class="fa-regular fa-comments ms-2 text-primary"></i></h2>
+        <p class="text-muted mb-4">Tertarik berdiskusi atau bekerja sama? Terhubung langsung melalui platform pilihan Anda:</p>
+        <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+          <a href="mailto:moh.alfian.nugrohoo@gmail.com" class="btn btn-contact btn-email rounded-3 px-4 py-2 fw-semibold">
+            <i class="fa-regular fa-envelope me-2"></i>Kirim Email
+          </a>
+          <a href="https://linkedin.com/in/moh-alfian-nugroho" target="_blank" class="btn btn-contact btn-linkedin rounded-3 px-4 py-2 fw-semibold">
+            <i class="fa-brands fa-linkedin me-2"></i>LinkedIn
+          </a>
+          <a href="https://wa.me/6285852957312" target="_blank" class="btn btn-contact btn-whatsapp rounded-3 px-4 py-2 fw-semibold">
+            <i class="fa-brands fa-whatsapp me-2"></i>WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="py-4 bg-dark text-center text-secondary border-top">
+    <div class="container">
+      <p class="mb-0 small">&copy; 2026 LИX.DEV. Crafted with Bootstrap 5 modern vibe.</p>
+    </div>
+  </footer>
+
+  <!-- Bootstrap 5 JS Bundle CDN (Termasuk Popper) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
