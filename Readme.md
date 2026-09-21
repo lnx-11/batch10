@@ -1,8 +1,8 @@
 # Repository Tugas Bootcamp Fullstack Developer Eduwork Batch 10
 
-## Tugas 1 - Fundamental Git, HTML dan AI
-## Tugas 2 - Mastering CSS & AI Stylling
-## Tugas 3 - Responsive Magic with Boostrap
+## Tugas 1 - Fundamental Git, HTML dan AI.
+## Tugas 2 - Mastering CSS & AI Stylling.
+## Tugas 3 - Responsive Magic with Boostrap.
 
 
 
