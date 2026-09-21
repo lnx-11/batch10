@@ -6,6 +6,28 @@
   min-height: 80vh;
   display: flex;
   align-items: center;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 88% 18%, rgba(6, 182, 212, 0.2), transparent 18rem),
+    linear-gradient(120deg, rgba(255, 255, 255, 0.85), rgba(224, 231, 255, 0.72));
+}
+
+.hero-container::before {
+  content: "";
+  position: absolute;
+  width: 22rem;
+  height: 22rem;
+  right: -8rem;
+  bottom: -11rem;
+  border: 2px solid rgba(79, 70, 229, 0.12);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2rem rgba(79, 70, 229, 0.04), 0 0 0 4rem rgba(79, 70, 229, 0.025);
+}
+
+.hero-container > .container {
+  position: relative;
+  z-index: 1;
 }
 
 /* Bingkai Foto Profil */
