@@ -3,6 +3,8 @@
 ## Tugas 1 - Fundamental Git, HTML dan AI.
 ## Tugas 2 - Mastering CSS & AI Stylling.
 ## Tugas 3 - Responsive Magic with Boostrap.
+## Tugas 4 - Build Your First Personal Profile Page.
+## Tugas 5 - Learn JavaScript Essentials usng AI.
 
 
 
