@@ -1,0 +1,97 @@
+/* Batasi lebar carousel di desktop dan jaga posisinya tetap di tengah. */
+.portfolio-carousel {
+  position: relative;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.portfolio-carousel .carousel-inner {
+  padding-top: 3.25rem;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
+}
+
+/* object-fit contain menjaga gambar utuh; tinggi dibatasi agar ukuran slide stabil. */
+.portfolio-carousel .carousel-item img {
+  width: 88%;
+  max-width: 760px;
+  height: clamp(240px, 42vw, 420px);
+  margin: 0 auto;
+  object-fit: contain;
+  padding: 1rem 0 4.75rem;
+}
+
+.portfolio-carousel .carousel-caption {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 0.55rem 1rem;
+  color: #ffffff;
+  background: rgba(15, 23, 42, 0.88);
+}
+
+.portfolio-carousel .carousel-caption h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.portfolio-carousel .carousel-caption p {
+  margin: 0.2rem 0 0;
+  font-size: 0.78rem;
+}
+
+.portfolio-carousel .carousel-indicators {
+  position: absolute;
+  top: 0.75rem;
+  right: 0;
+  bottom: auto;
+  left: 0;
+  z-index: 3;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.45rem 0.65rem;
+  width: max-content;
+  margin-inline: auto;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.portfolio-carousel .carousel-indicators [data-bs-target] {
+  width: 24px;
+  height: 3px;
+  margin: 0;
+  background-color: var(--primary);
+}
+
+.portfolio-carousel .carousel-control-prev-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%234f46e5' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 1 3 8l8 7'/%3e%3c/svg%3e");
+}
+
+.portfolio-carousel .carousel-control-next-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%234f46e5' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m5 1 8 7-8 7'/%3e%3c/svg%3e");
+}
+
+@media (max-width: 575.98px) {
+  /* Sesuaikan ruang gambar dan caption supaya tetap nyaman dibaca di ponsel. */
+  .portfolio-carousel .carousel-item img {
+    width: 94%;
+    height: 260px;
+    padding: 0.75rem 0 4.5rem;
+  }
+
+  .portfolio-carousel .carousel-caption {
+    width: 100%;
+    padding: 0.45rem 2.5rem;
+  }
+
+  .portfolio-carousel .carousel-caption h3 {
+    font-size: 0.9rem;
+  }
+
+  .portfolio-carousel .carousel-caption p {
+    font-size: 0.7rem;
+  }
+}
