@@ -44,7 +44,6 @@
     <li class="nav-item"><a class="nav-link fw-semibold" href="#tentang">Tentang</a></li>
     <li class="nav-item"><a class="nav-link fw-semibold" href="#pengalaman">Pengalaman</a></li>
     <li class="nav-item"><a class="nav-link fw-semibold" href="#keahlian">Keahlian</a></li>
-    <li class="nav-item"><a class="nav-link fw-semibold" href="#karya">Karya</a></li>
     <li class="nav-item"><a class="nav-link fw-semibold" href="#pendidikan">Pendidikan</a></li>
     <li class="nav-item mt-3 mt-lg-0">
       <a href="#kontak" class="btn btn-dark btn-nav px-4 rounded-3 fw-semibold">Let's Connect</a>
@@ -278,101 +277,51 @@
     </div>
   </div>
 
-  <!-- KEAHLIAN UTAMA SECTION -->
-  <section id="keahlian" class="py-5">
-    <div class="container py-4">
-      <div class="text-center mb-5">
-        <h2 class="section-title fw-bold">Keahlian Utama</h2>
-        <p class="text-muted">Kombinasi Tech Stack, Tools, dan Soft Skills.</p>
-      </div>
-
-      <div class="row g-4">
-        <div class="col-md-4">
-          <div class="card exp-card border-0 shadow-sm h-100 rounded-4 overflow-hidden">
-            <img src="assets/images/porto1.png" class="card-img-top" alt="Administrasi & Data">
-            <div class="card-body p-4">
-              <h5 class="fw-bold mb-3">Administrasi & Data</h5>
-              <div class="d-flex flex-wrap gap-2">
-                <span class="skill-pill">Data Entry</span>
-                <span class="skill-pill">Project Admin</span>
-                <span class="skill-pill">Digital Archiving</span>
-                <span class="skill-pill">Operasional</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-4">
-          <div class="card exp-card border-0 shadow-sm h-100 rounded-4 overflow-hidden">
-            <img src="assets/images/porto2.png" class="card-img-top" alt="Aplikasi & Tools">
-            <div class="card-body p-4">
-              <h5 class="fw-bold mb-3">Aplikasi & Tools</h5>
-              <div class="d-flex flex-wrap gap-2">
-                <span class="skill-pill">MS Office</span>
-                <span class="skill-pill">UI Design</span>
-                <span class="skill-pill">Canva</span>
-                <span class="skill-pill">Basic Editing</span>
-                <span class="skill-pill">Basic Coding</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-4">
-          <div class="card exp-card border-0 shadow-sm h-100 rounded-4 overflow-hidden">
-            <img src="assets/images/porto3.png" class="card-img-top" alt="Soft Skills">
-            <div class="card-body p-4">
-              <h5 class="fw-bold mb-3">Soft Skills</h5>
-              <div class="d-flex flex-wrap gap-2">
-                <span class="skill-pill">Leadership</span>
-                <span class="skill-pill">Teamwork</span>
-                <span class="skill-pill">Effective Comm</span>
-                <span class="skill-pill">Adaptive</span>
-                <span class="skill-pill">Detail-Oriented</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Carousel Bootstrap: semua kontrol di bawah menargetkan id #portfolioCarousel. -->
-  <section id="karya" class="py-5 bg-light-custom">
+  <!-- Carousel Bootstrap menjadi satu-satunya tampilan untuk Keahlian Utama. -->
+  <section id="keahlian" class="py-5 bg-light-custom">
     <div class="container py-4">
       <div class="text-center mb-4">
-        <h2 class="section-title fw-bold">Pilihan Karya</h2>
-        <p class="text-muted">Pilihan bidang dan proyek yang pernah dikerjakan.</p>
+        <h2 class="section-title fw-bold">Keahlian Utama</h2>
+        <p class="text-muted">Kombinasi administrasi, tools, dan soft skills.</p>
       </div>
 
       <!-- data-bs-ride mengaktifkan perpindahan otomatis; Bootstrap JS mengatur animasinya. -->
       <div id="portfolioCarousel" class="carousel slide portfolio-carousel" data-bs-ride="carousel">
         <!-- Indeks indikator dimulai dari 0 dan harus berurutan sesuai urutan slide. -->
         <div class="carousel-indicators">
-          <button type="button" data-bs-target="#portfolioCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Karya pertama"></button>
-          <button type="button" data-bs-target="#portfolioCarousel" data-bs-slide-to="1" aria-label="Karya kedua"></button>
-          <button type="button" data-bs-target="#portfolioCarousel" data-bs-slide-to="2" aria-label="Karya ketiga"></button>
+          <button type="button" data-bs-target="#portfolioCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Keahlian administrasi dan data"></button>
+          <button type="button" data-bs-target="#portfolioCarousel" data-bs-slide-to="1" aria-label="Keahlian aplikasi dan tools"></button>
+          <button type="button" data-bs-target="#portfolioCarousel" data-bs-slide-to="2" aria-label="Keahlian soft skills"></button>
         </div>
         <!-- Setiap carousel-item adalah satu slide; hanya slide pertama yang memakai active. -->
         <div class="carousel-inner rounded-4">
           <div class="carousel-item active">
-            <img src="assets/images/porto1.png" class="d-block" alt="Contoh karya administrasi dan data">
-            <div class="carousel-caption"><h3>Administrasi &amp; Data</h3><p>Pengelolaan data dan dokumen yang terstruktur.</p></div>
+            <img src="assets/images/porto1.png" class="d-block" alt="Administrasi dan data">
+            <div class="carousel-caption">
+              <h3>Administrasi &amp; Data</h3>
+              <ul class="carousel-skill-list"><li>Data Entry</li><li>Project Admin</li><li>Digital Archiving</li><li>Operasional</li></ul>
+            </div>
           </div>
           <div class="carousel-item">
-            <img src="assets/images/porto2.png" class="d-block" alt="Contoh karya aplikasi dan tools">
-            <div class="carousel-caption"><h3>Aplikasi &amp; Tools</h3><p>Pemanfaatan aplikasi untuk mendukung pekerjaan.</p></div>
+            <img src="assets/images/porto2.png" class="d-block" alt="Aplikasi dan tools">
+            <div class="carousel-caption">
+              <h3>Aplikasi &amp; Tools</h3>
+              <ul class="carousel-skill-list"><li>MS Office</li><li>UI Design</li><li>Canva</li><li>Basic Editing</li><li>Basic Coding</li></ul>
+            </div>
           </div>
           <div class="carousel-item">
-            <img src="assets/images/porto3.png" class="d-block" alt="Contoh kolaborasi dan soft skills">
-            <div class="carousel-caption"><h3>Kolaborasi Tim</h3><p>Komunikasi, kepemimpinan, dan kerja sama.</p></div>
+            <img src="assets/images/porto3.png" class="d-block" alt="Soft skills">
+            <div class="carousel-caption">
+              <h3>Soft Skills</h3>
+              <ul class="carousel-skill-list"><li>Leadership</li><li>Teamwork</li><li>Communication</li><li>Adaptive</li><li>Detail-Oriented</li></ul>
+            </div>
           </div>
         </div>
         <!-- Tombol panah berpindah relatif; data-bs-target menghubungkannya ke carousel ini. -->
-        <button class="carousel-control-prev" type="button" data-bs-target="#portfolioCarousel" data-bs-slide="prev" aria-label="Karya sebelumnya">
+        <button class="carousel-control-prev" type="button" data-bs-target="#portfolioCarousel" data-bs-slide="prev" aria-label="Keahlian sebelumnya">
           <span class="carousel-control-prev-icon" aria-hidden="true"></span>
         </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#portfolioCarousel" data-bs-slide="next" aria-label="Karya berikutnya">
+        <button class="carousel-control-next" type="button" data-bs-target="#portfolioCarousel" data-bs-slide="next" aria-label="Keahlian berikutnya">
           <span class="carousel-control-next-icon" aria-hidden="true"></span>
         </button>
       </div>
