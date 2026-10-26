@@ -6,8 +6,8 @@
                 <h1>Temukan yang kamu suka. <span class="text-warning">Bawa pulang.</span></h1>
                 <p class="hero-copy mt-4">Koleksi pilihan untuk menemani aktivitas dan gaya kamu setiap hari. Cari favoritmu dan mulai belanja dengan nyaman.</p>
                 <div class="d-flex flex-wrap gap-3 mt-4">
-                    <a href="{{ url('products') }}" class="btn btn-light btn-lg fw-bold rounded-3 px-4">Jelajahi Produk <span aria-hidden="true">&rarr;</span></a>
-                    <a href="{{ url('cart') }}" class="btn btn-outline-light btn-lg rounded-3 px-4">Lihat Keranjang</a>
+                    <a href="{{ route('products.index') }}" class="btn btn-light btn-lg fw-bold rounded-3 px-4">Jelajahi Produk <span aria-hidden="true">&rarr;</span></a>
+                    <a href="{{ route('cart.index') }}" class="btn btn-outline-light btn-lg rounded-3 px-4">Lihat Keranjang</a>
                 </div>
                 <div class="d-flex flex-wrap gap-4 mt-4 pt-2 small text-white-50">
                     <span>&#10003; Produk pilihan</span><span>&#10003; Belanja praktis</span><span>&#10003; Nyaman setiap saat</span>
@@ -15,7 +15,7 @@
             </div>
             <div class="col-lg-5 hero-visual">
                 <div class="hero-glow"></div>
-                <img class="hero-product" src="{{ asset('images/hero-workspace.jpg') }}" alt="Sneakers merah pilihan">
+                <img class="hero-product" src="{{ asset('images/hero-workspace.jpg') }}" alt="Ruang kerja dengan koleksi produk pilihan">
             </div>
         </div>
     </section>
@@ -23,19 +23,26 @@
     <section class="mb-5" id="koleksi">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-3">
             <div><span class="eyebrow">LИX.goods pilihan</span><h2 class="section-title mt-2 mb-0">Favorit untuk hari-harimu.</h2></div>
-            <a href="{{ url('products') }}" class="btn btn-outline-brand">Lihat semua produk <span aria-hidden="true">&rarr;</span></a>
+            <a href="{{ route('products.index') }}" class="btn btn-outline-brand">Lihat semua produk <span aria-hidden="true">&rarr;</span></a>
         </div>
         <div id="cart-feedback" class="alert alert-success d-none" role="status"></div>
+        @if (session('success'))
+            <div class="alert alert-success rounded-3" role="status">{{ session('success') }}</div>
+        @endif
+        @if (session('error'))
+            <div class="alert alert-danger rounded-3" role="alert">{{ session('error') }}</div>
+        @endif
         <div class="row g-4 mt-1">
             @foreach ($products as $product)
-                <div class="col-sm-6 col-lg-4">
+                <div class="col-sm-6 col-lg-3">
                     <x-product-card
-                        :image="$product['image']"
-                        :product-name="$product['name']"
-                        :product-description="$product['description']"
-                        :price="$product['price']"
-                        :category="$product['category']"
-                        :product-id="$product['id']"
+                        :image="asset($product->image)"
+                        :product-name="$product->name"
+                        :product-description="$product->description"
+                        :price="$product->price"
+                        :stock="$product->stock"
+                        :category="$product->category->name"
+                        :product-id="$product->id"
                     />
                 </div>
             @endforeach
@@ -53,7 +60,7 @@
     <section class="rounded-4 p-4 p-md-5" style="background:#eeedff">
         <div class="row align-items-center g-3">
             <div class="col-md-8"><span class="eyebrow">Saatnya menemukan favorit</span><h2 class="section-title mt-2 mb-2">Ada yang menarik untukmu.</h2><p class="text-secondary mb-0">Lihat koleksi produk dan temukan pilihan yang pas.</p></div>
-            <div class="col-md-4 text-md-end"><a href="{{ url('products') }}" class="btn btn-brand">Lihat semua produk <span aria-hidden="true">&rarr;</span></a></div>
+            <div class="col-md-4 text-md-end"><a href="{{ route('products.index') }}" class="btn btn-brand">Lihat semua produk <span aria-hidden="true">&rarr;</span></a></div>
         </div>
     </section>
 </x-layout>

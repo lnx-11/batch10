@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -25,6 +26,7 @@ test('database seeder creates the assignment categories and eight products with 
         ->and(DB::table('products')->whereNull('slug')->exists())->toBeFalse()
         ->and(DB::table('products')->where('price', '<=', 0)->exists())->toBeFalse()
         ->and(DB::table('products')->whereNull('product_category_id')->exists())->toBeFalse()
+        ->and(Product::where('slug', 'headphone-studio-one')->firstOrFail()->category->slug)->toBe('teknologi')
         ->and(DB::table('product_categories')->distinct()->count('slug'))->toBe(4)
         ->and(DB::table('products')->distinct()->count('slug'))->toBe(8);
 });

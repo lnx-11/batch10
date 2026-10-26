@@ -1,34 +1,30 @@
 <?php
 
+use App\Http\Controllers\ProductController;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-$products = [
-    ['id' => 1, 'name' => 'Sneaker Everyday', 'category' => 'Gaya hidup', 'description' => 'Ringan untuk langkah panjang dan santai.', 'price' => 579000, 'stock' => 25, 'label' => 'Terlaris', 'image' => asset('images/products/sneaker.jpg')],
-    ['id' => 2, 'name' => 'Tas Harian Transit', 'category' => 'Aksesori', 'description' => 'Ruang cukup untuk semua yang penting.', 'price' => 359000, 'stock' => 30, 'label' => '', 'image' => asset('images/products/tas-transit.jpg')],
-    ['id' => 3, 'name' => 'Jam Tangan Field', 'category' => 'Gaya hidup', 'description' => 'Desain sederhana, siap ikut ke mana saja.', 'price' => 789000, 'stock' => 10, 'label' => 'Baru', 'image' => asset('images/products/jam-tangan.jpg')],
-    ['id' => 4, 'name' => 'Headphone Studio One', 'category' => 'Teknologi', 'description' => 'Suara detail, nyaman dipakai seharian.', 'price' => 649000, 'stock' => 15, 'label' => 'Favorit', 'image' => asset('images/products/headphone-studio.jpg')],
-    ['id' => 5, 'name' => 'Lampu Meja Arc', 'category' => 'Rumah', 'description' => 'Cahaya hangat untuk sudut yang tenang.', 'price' => 429000, 'stock' => 20, 'label' => 'Pilihan editor', 'image' => asset('images/products/lampu-meja.jpg')],
-    ['id' => 6, 'name' => 'Tumbler Transit', 'category' => 'Gaya hidup', 'description' => 'Menjaga minuman tetap pas sepanjang hari.', 'price' => 189000, 'stock' => 50, 'label' => '', 'image' => asset('images/products/tumbler.jpg')],
-    ['id' => 7, 'name' => 'Kamera Pocket 35', 'category' => 'Teknologi', 'description' => 'Momen sehari-hari, tersimpan lebih berkesan.', 'price' => 1199000, 'stock' => 8, 'label' => 'Edisi pilihan', 'image' => asset('images/products/kamera-pocket.jpg')],
-    ['id' => 8, 'name' => 'Vas Bentuk Sora', 'category' => 'Rumah', 'description' => 'Siluet organik untuk meja dan rak favorit.', 'price' => 249000, 'stock' => 12, 'label' => '', 'image' => asset('images/products/vas-sora.jpg')],
-];
+Route::get('/', [ProductController::class, 'home'])->name('home');
+Route::get('products', [ProductController::class, 'index'])->name('products.index');
 
-Route::get('/', function () use ($products) {
-    return view('home.index', ['products' => array_slice($products, 0, 4)]);
-});
+Route::get('cart', function () {
+    $quantities = session('cart', []);
+    $products = Product::query()
+        ->whereIn('id', array_keys($quantities))
+        ->get()
+        ->keyBy('id');
 
-Route::get('products', function () use ($products) {
-    return view('product.description', compact('products'));
-})->name('products.index');
+    $items = collect($quantities)
+        ->map(function (int $quantity, int $productId) use ($products) {
+            $product = $products->get($productId);
 
-Route::get('cart', function () use ($products) {
-    $catalog = collect($products)->keyBy('id');
-    $items = collect(session('cart', []))
-        ->map(function (int $quantity, int $productId) use ($catalog) {
-            $product = $catalog->get($productId);
-
-            return $product ? [...$product, 'qty' => $quantity] : null;
+            return $product ? [
+                'id' => $product->id,
+                'name' => $product->name,
+                'price' => $product->price,
+                'qty' => $quantity,
+            ] : null;
         })
         ->filter()
         ->values()
@@ -37,14 +33,25 @@ Route::get('cart', function () use ($products) {
     return view('cart.index', compact('items'));
 })->name('cart.index');
 
-Route::post('cart/{productId}', function (Request $request, int $productId) use ($products) {
-    $product = collect($products)->firstWhere('id', $productId);
-    abort_if($product === null, 404);
+Route::post('cart/{product}', function (Request $request, Product $product) {
+    abort_if($product->stock < 1, 404, 'Produk sedang habis.');
 
     $cart = $request->session()->get('cart', []);
-    $cart[$productId] = min(($cart[$productId] ?? 0) + 1, 99);
+    $currentQuantity = $cart[$product->id] ?? 0;
+
+    if ($currentQuantity >= min($product->stock, 99)) {
+        $message = 'Jumlah produk sudah mencapai stok yang tersedia.';
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => $message], 422);
+        }
+
+        return back()->with('error', $message);
+    }
+
+    $cart[$product->id] = $currentQuantity + 1;
     $request->session()->put('cart', $cart);
-    $message = $product['name'].' ditambahkan ke keranjang.';
+    $message = $product->name.' ditambahkan ke keranjang.';
 
     if ($request->expectsJson()) {
         return response()->json([
@@ -56,18 +63,18 @@ Route::post('cart/{productId}', function (Request $request, int $productId) use 
     return back()->with('success', $message);
 })->name('cart.store');
 
-Route::post('cart/{productId}/quantity', function (Request $request, int $productId) use ($products) {
-    abort_if(collect($products)->firstWhere('id', $productId) === null, 404);
+Route::post('cart/{product}/quantity', function (Request $request, Product $product) {
     $validated = $request->validate(['delta' => ['required', 'integer', 'in:-1,1']]);
-
     $cart = $request->session()->get('cart', []);
-    $quantity = ($cart[$productId] ?? 0) + $validated['delta'];
+    $quantity = ($cart[$product->id] ?? 0) + $validated['delta'];
 
     if ($quantity < 1) {
-        unset($cart[$productId]);
+        unset($cart[$product->id]);
         $message = 'Produk dihapus dari keranjang.';
+    } elseif ($quantity > min($product->stock, 99)) {
+        $message = 'Jumlah produk sudah mencapai stok yang tersedia.';
     } else {
-        $cart[$productId] = $quantity;
+        $cart[$product->id] = $quantity;
         $message = 'Jumlah produk diperbarui.';
     }
 
@@ -76,9 +83,9 @@ Route::post('cart/{productId}/quantity', function (Request $request, int $produc
     return back()->with('success', $message);
 })->name('cart.quantity');
 
-Route::post('cart/{productId}/remove', function (Request $request, int $productId) {
+Route::post('cart/{product}/remove', function (Request $request, Product $product) {
     $cart = $request->session()->get('cart', []);
-    $cart = array_filter($cart, static fn ($key) => (int) $key !== $productId, ARRAY_FILTER_USE_KEY);
+    unset($cart[$product->id]);
     $request->session()->put('cart', $cart);
 
     return back()->with('success', 'Produk dihapus dari keranjang.');

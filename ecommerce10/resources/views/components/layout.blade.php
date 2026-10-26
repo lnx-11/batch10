@@ -53,6 +53,7 @@
         .page-heading h1 { font-size:clamp(2.2rem,4vw,3.25rem); font-weight:800; letter-spacing:-.05em; }
         .category-chip { display:inline-block; padding:8px 14px; border:1px solid #e7e8f0; border-radius:999px; background:#fff; color:#68738a; font-size:.84rem; font-weight:700; }
         .category-chip.active { border-color:#d9d6ff; background:#f0efff; color:var(--brand); }
+        .catalog-pagination nav > div.d-sm-flex { column-gap:1rem; }
         .site-footer { margin-top:70px; background:#191c32; color:#b9bdd0; }
         .site-footer a { color:#dfe1ed; }
         .site-footer a:hover { color:#fff; }
