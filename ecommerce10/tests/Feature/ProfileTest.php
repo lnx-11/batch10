@@ -15,6 +15,20 @@ test('profile page is displayed', function () {
         ->assertSee('aria-controls="update_password_password_confirmation"', false);
 });
 
+test('dashboard resource routes are protected and use the dashboard prefix', function () {
+    $this->get(route('dashboard'))
+        ->assertRedirect(route('login'));
+
+    $this->get(route('dashboard.products.index'))
+        ->assertRedirect(route('login'));
+
+    $this->get(route('dashboard.product-categories.index'))
+        ->assertRedirect(route('login'));
+
+    $this->assertSame('/dashboard/products', route('dashboard.products.index', absolute: false));
+    $this->assertSame('/dashboard/product-categories', route('dashboard.product-categories.index', absolute: false));
+});
+
 test('profile information can be updated', function () {
     $user = User::factory()->create();
 
