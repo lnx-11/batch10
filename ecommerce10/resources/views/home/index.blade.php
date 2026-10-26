@@ -7,7 +7,7 @@
                 <p class="hero-copy mt-4">Koleksi pilihan untuk menemani aktivitas dan gaya kamu setiap hari. Cari favoritmu dan mulai belanja dengan nyaman.</p>
                 <div class="d-flex flex-wrap gap-3 mt-4">
                     <a href="{{ route('products.index') }}" class="btn btn-light btn-lg fw-bold rounded-3 px-4">Jelajahi Produk <span aria-hidden="true">&rarr;</span></a>
-                    <a href="{{ route('cart.index') }}" class="btn btn-outline-light btn-lg rounded-3 px-4">Lihat Keranjang</a>
+                    <a href="{{ auth()->check() ? route('cart.index') : route('login') }}" class="btn btn-outline-light btn-lg rounded-3 px-4">{{ auth()->check() ? 'Lihat Keranjang' : 'Login untuk keranjang' }}</a>
                 </div>
                 <div class="d-flex flex-wrap gap-4 mt-4 pt-2 small text-white-50">
                     <span>&#10003; Produk pilihan</span><span>&#10003; Belanja praktis</span><span>&#10003; Nyaman setiap saat</span>
@@ -23,7 +23,7 @@
     <section class="mb-5" id="koleksi">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-3">
             <div><span class="eyebrow">LИX.goods pilihan</span><h2 class="section-title mt-2 mb-0">Favorit untuk hari-harimu.</h2></div>
-            <a href="{{ route('products.index') }}" class="btn btn-outline-brand">Lihat semua produk <span aria-hidden="true">&rarr;</span></a>
+            <a href="{{ auth()->check() ? route('products.index') : route('login') }}" class="btn btn-outline-brand">Lihat semua produk <span aria-hidden="true">&rarr;</span></a>
         </div>
         <div id="cart-feedback" class="alert alert-success d-none" role="status"></div>
         @if (session('success'))
@@ -60,7 +60,7 @@
     <section class="rounded-4 p-4 p-md-5" style="background:#eeedff">
         <div class="row align-items-center g-3">
             <div class="col-md-8"><span class="eyebrow">Saatnya menemukan favorit</span><h2 class="section-title mt-2 mb-2">Ada yang menarik untukmu.</h2><p class="text-secondary mb-0">Lihat koleksi produk dan temukan pilihan yang pas.</p></div>
-            <div class="col-md-4 text-md-end"><a href="{{ route('products.index') }}" class="btn btn-brand">Lihat semua produk <span aria-hidden="true">&rarr;</span></a></div>
+            <div class="col-md-4 text-md-end"><a href="{{ auth()->check() ? route('products.index') : route('login') }}" class="btn btn-brand">Lihat semua produk <span aria-hidden="true">&rarr;</span></a></div>
         </div>
     </section>
 </x-layout>

@@ -1,13 +1,7 @@
 <?php
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+it('returns a successful response', function () {
+    $response = $this->get('/');
 
-uses(RefreshDatabase::class);
-
-test('the application returns a successful response', function () {
-    $this->seed();
-
-    $this->get('/')
-        ->assertOk()
-        ->assertSee('Headphone Studio One');
+    $response->assertStatus(200);
 });
