@@ -29,15 +29,26 @@ class ProductController extends Controller
         return view('home.index', compact('products'));
     }
 
-    public function catalog(): View
+    public function catalog(Request $request): View
     {
+        $filters = $request->validate([
+            'search' => ['nullable', 'string', 'max:100'],
+        ]);
+        $search = trim($filters['search'] ?? '');
+
         $products = Product::query()
             ->with('category')
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where('name', 'like', '%'.$search.'%')
+                        ->orWhere('description', 'like', '%'.$search.'%');
+                });
+            })
             ->orderBy('id')
             ->paginate(6)
             ->withQueryString();
 
-        return view('product.description', compact('products'));
+        return view('product.description', compact('products', 'search'));
     }
 
     public function trackClick(Product $product): JsonResponse

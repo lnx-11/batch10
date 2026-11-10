@@ -47,7 +47,7 @@ test('the store homepage exposes Breeze login and registration to guests', funct
         ->assertSee('<a href="'.route('login').'" class="btn btn-brand py-2 px-3">Tambah <span aria-hidden="true">+</span></a>', false)
         ->assertSee(route('register'), false)
         ->assertSee('href="'.route('login').'"', false)
-        ->assertSee('href="'.route('login').'" class="btn btn-outline-brand"', false)
+        ->assertDontSee('href="'.route('login').'" class="btn btn-outline-brand"', false)
         ->assertSee('href="'.route('login').'" class="btn btn-brand"', false);
 });
 
@@ -117,4 +117,13 @@ test('the catalog loads products from the database and paginates six products pe
         ->assertSee('Vas Bentuk Sora')
         ->assertSee('Tas Harian Transit')
         ->assertDontSee('Headphone Studio One');
+});
+
+test('the catalog filters products by name or description', function () {
+    $this->get(route('products.index', ['search' => 'Headphone Studio One']))
+        ->assertOk()
+        ->assertSee('Headphone Studio One')
+        ->assertDontSee('Kamera Pocket 35')
+        ->assertSee('name="search"', false)
+        ->assertSee('value="Headphone Studio One"', false);
 });

@@ -14,7 +14,8 @@ Route::post('/products/{product}/click', [ProductController::class, 'trackClick'
     ->middleware('throttle:120,1')
     ->name('products.click');
 
-Route::prefix('dashboard')->middleware('auth')->group(function () {
+// Admin dashboard and catalog management routes require both authentication and the admin role.
+Route::prefix('dashboard')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('products', ProductController::class)
         ->except('show')

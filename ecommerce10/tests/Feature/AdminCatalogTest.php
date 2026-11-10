@@ -12,7 +12,7 @@ uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->seed();
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 });
 
 test('admin can view product and category tables', function () {
@@ -27,7 +27,7 @@ test('admin can view product and category tables', function () {
         ->assertSee('Tambah Produk')
         ->assertDontSee('Tambah Kategori')
         ->assertSee('class="admin-reset-button"', false)
-        ->assertSee('x-on:input.debounce.400ms="$el.form.requestSubmit()"', false)
+        ->assertSee("x-on:input.debounce.400ms=\"sessionStorage.setItem('admin-product-search-focus', String(\$el.selectionStart)); \$el.form.requestSubmit()\"", false)
         ->assertSee('x-on:change="$el.form.requestSubmit()"', false)
         ->assertDontSee('>Filter</button>', false);
 

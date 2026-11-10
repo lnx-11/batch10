@@ -21,9 +21,9 @@
     </section>
 
     <section class="mb-5" id="koleksi">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-3">
-            <div><span class="eyebrow">LИX.goods pilihan</span><h2 class="section-title mt-2 mb-0">Favorit untuk hari-harimu.</h2></div>
-            <a href="{{ auth()->check() ? route('products.index') : route('login') }}" class="btn btn-outline-brand">Lihat semua produk <span aria-hidden="true">&rarr;</span></a>
+        <div class="mb-3">
+            <span class="eyebrow">LИX.goods pilihan</span>
+            <h2 class="section-title mt-2 mb-0">Favorit untuk hari-harimu.</h2>
         </div>
         <div id="cart-feedback" class="alert alert-success d-none" role="status"></div>
         @if (session('success'))

@@ -19,5 +19,6 @@ test('new users can register', function () {
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
+    $this->assertSame('user', auth()->user()->fresh()->role);
+    $response->assertRedirect(route('home', absolute: false));
 });

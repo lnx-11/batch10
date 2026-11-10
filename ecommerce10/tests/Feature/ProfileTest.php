@@ -27,6 +27,14 @@ test('dashboard resource routes are protected and use the dashboard prefix', fun
 
     $this->assertSame('/dashboard/products', route('dashboard.products.index', absolute: false));
     $this->assertSame('/dashboard/product-categories', route('dashboard.product-categories.index', absolute: false));
+
+    $this->actingAs(User::factory()->create())
+        ->get(route('dashboard'))
+        ->assertForbidden();
+
+    $this->actingAs(User::factory()->admin()->create())
+        ->get(route('dashboard'))
+        ->assertOk();
 });
 
 test('profile information can be updated', function () {

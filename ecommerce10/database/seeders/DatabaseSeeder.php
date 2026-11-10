@@ -12,10 +12,12 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        User::firstOrCreate(
+        $admin = User::firstOrCreate(
             ['email' => 'test@example.com'],
             ['name' => 'Test User', 'password' => 'password'],
         );
+        // Keep the existing sample account available for admin dashboard exercises.
+        $admin->forceFill(['role' => 'admin'])->save();
 
         $this->call([
             ProductCategorySeeder::class,

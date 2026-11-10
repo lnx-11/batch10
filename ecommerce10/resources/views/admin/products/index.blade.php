@@ -20,7 +20,7 @@
             <form method="GET" action="{{ route('dashboard.products.index') }}" x-data class="flex flex-col gap-3 rounded-lg bg-white p-4 shadow-sm md:flex-row md:items-end dark:bg-gray-800">
                 <div class="min-w-0 flex-1">
                     <x-input-label for="search" value="Cari produk" class="text-xs" />
-                    <x-text-input id="search" name="search" type="search" class="mt-1 block w-full py-2 text-sm" :value="$search" placeholder="Nama atau deskripsi" x-on:input.debounce.400ms="$el.form.requestSubmit()" />
+                    <x-text-input id="search" name="search" type="search" class="mt-1 block w-full py-2 text-sm" :value="$search" placeholder="Nama atau deskripsi" x-on:input.debounce.400ms="sessionStorage.setItem('admin-product-search-focus', String($el.selectionStart)); $el.form.requestSubmit()" />
                 </div>
                 <div class="w-full md:w-52">
                     <x-input-label for="category_id" value="Kategori" class="text-xs" />
@@ -103,4 +103,21 @@
     <dialog class="admin-modal-dialog" data-admin-modal aria-labelledby="admin-modal-title">
         <div class="admin-modal-panel" data-admin-modal-content></div>
     </dialog>
+    <script>
+        (() => {
+            const focusStateKey = 'admin-product-search-focus';
+            const savedFocusState = sessionStorage.getItem(focusStateKey);
+
+            if (savedFocusState === null) return;
+
+            sessionStorage.removeItem(focusStateKey);
+
+            const input = document.getElementById('search');
+            if (!input) return;
+
+            const selectionStart = Math.min(Number(savedFocusState), input.value.length);
+            input.focus();
+            input.setSelectionRange(selectionStart, selectionStart);
+        })();
+    </script>
 </x-app-layout>
