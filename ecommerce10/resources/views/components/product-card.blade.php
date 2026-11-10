@@ -1,4 +1,4 @@
-<article class="product-card">
+<article class="product-card" data-product-click data-click-url="{{ route('products.click', $productId) }}">
     <div class="product-image-wrap">
         <span class="product-badge">{{ $category }}</span>
         <img src="{{ $image }}" class="product-image" alt="{{ $productName }}" loading="lazy">

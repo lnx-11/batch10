@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#f7f8fc">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'LИX.goods | Toko Pilihan' }}</title>
     <link rel="icon" type="image/jpeg" href="{{ asset('images/brand-logo.jpg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -74,6 +75,23 @@
     <x-footer />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        document.addEventListener('click', (event) => {
+            const productCard = event.target.closest('[data-product-click]');
+            if (!productCard) return;
+
+            fetch(productCard.dataset.clickUrl, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                keepalive: true,
+                credentials: 'same-origin',
+            }).then((response) => {
+                if (!response.ok) throw new Error('Klik produk gagal dicatat.');
+            }).catch((error) => console.error(error));
+        });
+
         document.addEventListener('submit', async (event) => {
             const form = event.target.closest('form[data-cart-ajax]');
             if (!form) return;

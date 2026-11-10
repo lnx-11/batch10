@@ -3,10 +3,144 @@ import './bootstrap';
 import Alpine from 'alpinejs';
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
+import Chart from 'chart.js/auto';
 
 window.Alpine = Alpine;
 
 Alpine.start();
+
+const orderChartCanvas = document.querySelector('[data-dashboard-orders]');
+
+if (orderChartCanvas) {
+    const revenueValues = JSON.parse(orderChartCanvas.dataset.revenue);
+    const maximumRevenue = Math.max(...revenueValues, 0);
+    const revenueStep = Math.max(50000, Math.ceil(maximumRevenue / 5 / 50000) * 50000);
+    const revenueMaximum = Math.max(250000, Math.ceil(maximumRevenue / revenueStep) * revenueStep);
+
+    new Chart(orderChartCanvas, {
+        type: 'line',
+        data: {
+            labels: JSON.parse(orderChartCanvas.dataset.labels),
+            datasets: [
+                {
+                    label: 'Pesanan',
+                    data: JSON.parse(orderChartCanvas.dataset.orders),
+                    borderColor: '#5146e5',
+                    backgroundColor: 'rgba(81, 70, 229, .12)',
+                    yAxisID: 'orders',
+                    tension: 0.35,
+                    fill: true,
+                },
+                {
+                    label: 'Pendapatan',
+                    data: revenueValues,
+                    borderColor: '#e45d88',
+                    backgroundColor: 'rgba(228, 93, 136, .12)',
+                    yAxisID: 'revenue',
+                    tension: 0.35,
+                    fill: true,
+                },
+            ],
+        },
+        options: {
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { position: 'top', align: 'center', labels: { boxWidth: 18, padding: 12 } },
+            },
+            scales: {
+                orders: {
+                    type: 'linear',
+                    position: 'left',
+                    beginAtZero: true,
+                    ticks: { precision: 0, font: { size: 10 } },
+                    title: { display: true, text: 'Pesanan' },
+                },
+                revenue: {
+                    type: 'linear',
+                    position: 'right',
+                    beginAtZero: true,
+                    max: revenueMaximum,
+                    grid: { drawOnChartArea: false },
+                    ticks: {
+                        stepSize: revenueStep,
+                        precision: 0,
+                        font: { size: 10 },
+                        callback: (value) => `Rp ${new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 }).format(value)}`,
+                    },
+                    title: { display: true, text: 'Pendapatan' },
+                },
+                x: {
+                    ticks: {
+                        autoSkip: true,
+                        maxTicksLimit: 7,
+                        maxRotation: 0,
+                        minRotation: 0,
+                        font: { size: 10 },
+                    },
+                },
+            },
+            onResize(chart, size) {
+                const compact = size.width < 520;
+                chart.options.scales.orders.ticks.display = !compact;
+                chart.options.scales.orders.title.display = !compact;
+                chart.options.scales.revenue.title.display = !compact;
+                chart.options.scales.revenue.ticks.maxTicksLimit = compact ? 4 : undefined;
+                chart.options.scales.revenue.ticks.font = { size: compact ? 9 : 10 };
+                chart.options.scales.x.ticks.maxTicksLimit = compact ? 4 : 7;
+                chart.options.scales.x.ticks.font = { size: compact ? 9 : 10 };
+                chart.options.plugins.legend.position = compact ? 'bottom' : 'top';
+                chart.update('none');
+            },
+        },
+    });
+}
+
+const clickChartCanvas = document.querySelector('[data-dashboard-clicks]');
+
+if (clickChartCanvas) {
+    new Chart(clickChartCanvas, {
+        type: 'doughnut',
+        data: {
+            labels: JSON.parse(clickChartCanvas.dataset.labels),
+            datasets: [{
+                data: JSON.parse(clickChartCanvas.dataset.values),
+                backgroundColor: ['#5146e5', '#16a7a1', '#f3aa45', '#e45d88', '#4b91d1', '#8e65bd'],
+                borderColor: '#fff',
+                borderWidth: 3,
+                hoverOffset: 8,
+            }],
+        },
+        options: {
+            maintainAspectRatio: false,
+            cutout: '62%',
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 18, padding: 12 } } },
+        },
+    });
+}
+
+const orderStatusCanvas = document.querySelector('[data-dashboard-order-status]');
+
+if (orderStatusCanvas) {
+    new Chart(orderStatusCanvas, {
+        type: 'doughnut',
+        data: {
+            labels: JSON.parse(orderStatusCanvas.dataset.labels),
+            datasets: [{
+                data: JSON.parse(orderStatusCanvas.dataset.values),
+                backgroundColor: ['#69b9ae', '#e8799a', '#efc75e', '#6ca6df'],
+                borderColor: '#fff',
+                borderWidth: 3,
+                hoverOffset: 8,
+            }],
+        },
+        options: {
+            maintainAspectRatio: false,
+            cutout: '62%',
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 18, padding: 12 } } },
+        },
+    });
+}
 
 function initializeProductImageForms(container = document) {
     container.querySelectorAll('[data-product-image-form]:not([data-cropper-ready])').forEach((form) => {

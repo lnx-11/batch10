@@ -71,6 +71,12 @@
             .store-admin .admin-modal-close { display: inline-flex; height: 2.25rem; width: 2.25rem; align-items: center; justify-content: center; border: 1px solid var(--store-border); border-radius: 10px; background: #fff; color: var(--store-muted); font-size: 1.25rem; }
             .store-admin table thead th { letter-spacing: .06em; }
             .store-admin table tbody tr:hover { background: #fafaff; }
+            .store-admin .admin-orders-scroll { scrollbar-width: thin; scrollbar-color: #a5a9bd #f1f2f7; }
+            .store-admin .admin-orders-scroll:focus-visible { outline: 2px solid var(--store-brand); outline-offset: -2px; }
+            .store-admin .admin-orders-scroll::-webkit-scrollbar { height: 8px; }
+            .store-admin .admin-orders-scroll::-webkit-scrollbar-track { border-radius: 999px; background: #f1f2f7; }
+            .store-admin .admin-orders-scroll::-webkit-scrollbar-thumb { border: 2px solid #f1f2f7; border-radius: 999px; background: #a5a9bd; }
+            .store-admin .admin-orders-scroll::-webkit-scrollbar-thumb:hover { background: var(--store-brand); }
             .store-admin input:not([type="checkbox"]):not([type="file"]), .store-admin select, .store-admin textarea { border-color: #d9dce8; border-radius: 11px; background-color: #fff; color: var(--store-ink); }
             .store-admin input[type="file"] { color: var(--store-muted); }
             .store-admin input[type="checkbox"] { accent-color: var(--store-brand); }

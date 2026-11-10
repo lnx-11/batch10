@@ -40,6 +40,13 @@ class ProductController extends Controller
         return view('product.description', compact('products'));
     }
 
+    public function trackClick(Product $product): JsonResponse
+    {
+        $product->increment('click_count');
+
+        return response()->json(['message' => 'Klik produk dicatat.']);
+    }
+
     public function index(Request $request): View
     {
         $filters = $request->validate([
@@ -71,7 +78,7 @@ class ProductController extends Controller
 
         $products = $query->paginate(10)->withQueryString();
 
-        return view('dashboard.products.index', compact('products', 'categories', 'search', 'sort'));
+        return view('admin.products.index', compact('products', 'categories', 'search', 'sort'));
     }
 
     public function create(): View|JsonResponse
@@ -81,11 +88,11 @@ class ProductController extends Controller
 
         if (request()->header('X-Admin-Modal') === 'true') {
             return response()->json([
-                'html' => view('dashboard.products.modal-form', compact('product', 'categories'))->render(),
+                'html' => view('admin.products.modal-form', compact('product', 'categories'))->render(),
             ]);
         }
 
-        return view('dashboard.products.form', compact('product', 'categories'));
+        return view('admin.products.form', compact('product', 'categories'));
     }
 
     public function store(Request $request): RedirectResponse|JsonResponse
@@ -124,11 +131,11 @@ class ProductController extends Controller
 
         if (request()->header('X-Admin-Modal') === 'true') {
             return response()->json([
-                'html' => view('dashboard.products.modal-form', compact('product', 'categories'))->render(),
+                'html' => view('admin.products.modal-form', compact('product', 'categories'))->render(),
             ]);
         }
 
-        return view('dashboard.products.form', compact('product', 'categories'));
+        return view('admin.products.form', compact('product', 'categories'));
     }
 
     public function update(Request $request, Product $product): RedirectResponse|JsonResponse

@@ -29,6 +29,7 @@ class Product extends Model
         return [
             'price' => 'integer',
             'stock' => 'integer',
+            'click_count' => 'integer',
         ];
     }
 

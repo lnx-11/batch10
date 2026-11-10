@@ -31,7 +31,7 @@ class ProductCategoryController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('dashboard.product-categories.index', compact('categories', 'search'));
+        return view('admin.product_categories.index', compact('categories', 'search'));
     }
 
     public function create(): View|JsonResponse
@@ -40,11 +40,11 @@ class ProductCategoryController extends Controller
 
         if (request()->header('X-Admin-Modal') === 'true') {
             return response()->json([
-                'html' => view('dashboard.product-categories.modal-form', compact('category'))->render(),
+                'html' => view('admin.product_categories.modal-form', compact('category'))->render(),
             ]);
         }
 
-        return view('dashboard.product-categories.form', compact('category'));
+        return view('admin.product_categories.form', compact('category'));
     }
 
     public function store(Request $request): RedirectResponse|JsonResponse
@@ -73,11 +73,11 @@ class ProductCategoryController extends Controller
 
         if (request()->header('X-Admin-Modal') === 'true') {
             return response()->json([
-                'html' => view('dashboard.product-categories.modal-form', compact('category'))->render(),
+                'html' => view('admin.product_categories.modal-form', compact('category'))->render(),
             ]);
         }
 
-        return view('dashboard.product-categories.form', compact('category'));
+        return view('admin.product_categories.form', compact('category'));
     }
 
     public function update(Request $request, ProductCategory $productCategory): RedirectResponse|JsonResponse

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -9,9 +10,12 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [ProductController::class, 'home'])->name('home');
 Route::get('/shop', [ProductController::class, 'home'])->name('shop.home');
 Route::get('/products', [ProductController::class, 'catalog'])->name('products.index');
+Route::post('/products/{product}/click', [ProductController::class, 'trackClick'])
+    ->middleware('throttle:120,1')
+    ->name('products.click');
 
 Route::prefix('dashboard')->middleware('auth')->group(function () {
-    Route::view('/', 'dashboard')->name('dashboard');
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('products', ProductController::class)
         ->except('show')
         ->names('dashboard.products');
