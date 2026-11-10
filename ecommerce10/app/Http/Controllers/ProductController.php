@@ -6,11 +6,14 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\File as FileRule;
 
 class ProductController extends Controller
 {
@@ -37,33 +40,63 @@ class ProductController extends Controller
         return view('product.description', compact('products'));
     }
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $products = Product::query()
-            ->with('category')
-            ->orderBy('id')
-            ->paginate(10);
+        $filters = $request->validate([
+            'search' => ['nullable', 'string', 'max:100'],
+            'category_id' => ['nullable', 'integer', 'exists:product_categories,id'],
+            'sort' => ['nullable', Rule::in(['name_asc', 'name_desc', 'price_asc', 'price_desc'])],
+        ]);
 
-        return view('dashboard.products.index', compact('products'));
+        $search = trim($filters['search'] ?? '');
+        $sort = $filters['sort'] ?? 'name_asc';
+        $categories = ProductCategory::query()->orderBy('name')->get();
+
+        $query = Product::query()
+            ->with('category')
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where('name', 'like', '%'.$search.'%')
+                        ->orWhere('description', 'like', '%'.$search.'%');
+                });
+            })
+            ->when($filters['category_id'] ?? null, fn ($query, $categoryId) => $query->where('product_category_id', $categoryId));
+
+        match ($sort) {
+            'name_desc' => $query->orderByDesc('name'),
+            'price_asc' => $query->orderBy('price')->orderBy('name'),
+            'price_desc' => $query->orderByDesc('price')->orderBy('name'),
+            default => $query->orderBy('name'),
+        };
+
+        $products = $query->paginate(10)->withQueryString();
+
+        return view('dashboard.products.index', compact('products', 'categories', 'search', 'sort'));
     }
 
-    public function create(): View
+    public function create(): View|JsonResponse
     {
         $product = new Product;
         $categories = ProductCategory::query()->orderBy('name')->get();
 
+        if (request()->header('X-Admin-Modal') === 'true') {
+            return response()->json([
+                'html' => view('dashboard.products.modal-form', compact('product', 'categories'))->render(),
+            ]);
+        }
+
         return view('dashboard.products.form', compact('product', 'categories'));
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'product_category_id' => ['required', 'integer', 'exists:product_categories,id'],
             'name' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
+            'description' => ['required', 'string', 'max:5000'],
             'stock' => ['required', 'integer', 'min:0'],
             'price' => ['required', 'integer', 'min:0'],
-            'image' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'image' => ['required', FileRule::image()->types(['jpg', 'jpeg', 'png', 'webp'])->max(2048), 'dimensions:min_width=100,min_height=100,max_width=2048,max_height=2048'],
         ]);
 
         $image = $validated['image'];
@@ -71,27 +104,42 @@ class ProductController extends Controller
 
         $validated['slug'] = $this->uniqueSlug($validated['name']);
         $validated['image'] = $this->storeImage($image);
-        Product::query()->create($validated);
+        $product = Product::query()->create($validated);
+
+        if ($request->expectsJson()) {
+            $request->session()->flash('success', 'Produk berhasil ditambahkan.');
+
+            return response()->json([
+                'message' => 'Produk berhasil ditambahkan.',
+                'product' => $product,
+            ]);
+        }
 
         return to_route('dashboard.products.index')->with('success', 'Produk berhasil ditambahkan.');
     }
 
-    public function edit(Product $product): View
+    public function edit(Product $product): View|JsonResponse
     {
         $categories = ProductCategory::query()->orderBy('name')->get();
+
+        if (request()->header('X-Admin-Modal') === 'true') {
+            return response()->json([
+                'html' => view('dashboard.products.modal-form', compact('product', 'categories'))->render(),
+            ]);
+        }
 
         return view('dashboard.products.form', compact('product', 'categories'));
     }
 
-    public function update(Request $request, Product $product): RedirectResponse
+    public function update(Request $request, Product $product): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'product_category_id' => ['required', 'integer', 'exists:product_categories,id'],
             'name' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
+            'description' => ['required', 'string', 'max:5000'],
             'stock' => ['required', 'integer', 'min:0'],
             'price' => ['required', 'integer', 'min:0'],
-            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'image' => ['nullable', FileRule::image()->types(['jpg', 'jpeg', 'png', 'webp'])->max(2048), 'dimensions:min_width=100,min_height=100,max_width=2048,max_height=2048'],
         ]);
 
         $image = $validated['image'] ?? null;
@@ -105,6 +153,12 @@ class ProductController extends Controller
             $this->deleteManagedImage($oldImage);
         } else {
             $product->update($validated);
+        }
+
+        if ($request->expectsJson()) {
+            $request->session()->flash('success', 'Produk berhasil diperbarui.');
+
+            return response()->json(['message' => 'Produk berhasil diperbarui.']);
         }
 
         return to_route('dashboard.products.index')->with('success', 'Produk berhasil diperbarui.');

@@ -60,8 +60,15 @@
             .store-admin .admin-mobile-menu { display: none; border-top: 1px solid var(--store-border); padding: .75rem 1.25rem 1rem; }
             .store-admin .admin-mobile-menu .admin-nav-link { display: flex; width: 100%; }
             .store-admin .admin-mobile-user { margin: .5rem 0; padding: .75rem .85rem; border-top: 1px solid var(--store-border); color: var(--store-muted); font-size: .9rem; }
+            .store-admin .admin-reset-button { display: inline-flex; min-height: 40px; flex-shrink: 0; align-items: center; justify-content: center; border: 1px solid var(--store-brand); border-radius: 10px; background: var(--store-brand); padding: .5rem 1rem; color: #fff; font-size: .875rem; font-weight: 700; text-decoration: none; transition: background .15s ease, border-color .15s ease; }
+            .store-admin .admin-reset-button:hover { border-color: var(--store-brand-dark); background: var(--store-brand-dark); color: #fff; }
             .store-admin .admin-page-heading { border-bottom: 0; background: transparent; box-shadow: none; }
             .store-admin .admin-content { min-height: calc(100vh - 76px); }
+            .store-admin .admin-modal-dialog { width: min(94vw, 42rem); max-width: none; max-height: 90vh; overflow: auto; border: 0; border-radius: 20px; padding: 0; background: transparent; color: var(--store-ink); box-shadow: 0 24px 80px rgba(23,32,51,.24); }
+            .store-admin .admin-modal-dialog::backdrop { background: rgba(23,32,51,.58); backdrop-filter: blur(3px); }
+            .store-admin .admin-modal-panel { border-radius: 20px; background: var(--store-surface); padding: 1.5rem; }
+            .store-admin .admin-modal-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; border-bottom: 1px solid var(--store-border); padding-bottom: 1rem; }
+            .store-admin .admin-modal-close { display: inline-flex; height: 2.25rem; width: 2.25rem; align-items: center; justify-content: center; border: 1px solid var(--store-border); border-radius: 10px; background: #fff; color: var(--store-muted); font-size: 1.25rem; }
             .store-admin table thead th { letter-spacing: .06em; }
             .store-admin table tbody tr:hover { background: #fafaff; }
             .store-admin input:not([type="checkbox"]):not([type="file"]), .store-admin select, .store-admin textarea { border-color: #d9dce8; border-radius: 11px; background-color: #fff; color: var(--store-ink); }

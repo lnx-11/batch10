@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">Daftar Kategori Produk</h2>
-            <a href="{{ route('dashboard.product-categories.create') }}" class="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">
+            <a href="{{ route('dashboard.product-categories.create') }}" class="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700" data-admin-modal-trigger>
                 Tambah Kategori
             </a>
         </div>
@@ -18,6 +18,15 @@
             @endif
 
             <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
+                <div class="border-b border-gray-200 p-4 dark:border-gray-700">
+                    <form method="GET" action="{{ route('dashboard.product-categories.index') }}" x-data class="flex flex-col gap-3 sm:flex-row sm:items-end">
+                        <div class="w-full sm:max-w-md sm:flex-1">
+                            <x-input-label for="search" value="Cari kategori" class="text-xs" />
+                            <x-text-input id="search" name="search" type="search" class="mt-1 block w-full py-2 text-sm" :value="$search" placeholder="Nama kategori" x-on:input.debounce.400ms="$el.form.requestSubmit()" />
+                        </div>
+                        <a href="{{ route('dashboard.product-categories.index') }}" class="admin-reset-button">Reset</a>
+                    </form>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead class="bg-gray-50 dark:bg-gray-700">
@@ -39,7 +48,7 @@
                                     <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-200">{{ $category->products_count }}</td>
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-3">
-                                            <a href="{{ route('dashboard.product-categories.edit', $category) }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-800">Edit</a>
+                                            <a href="{{ route('dashboard.product-categories.edit', $category) }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-800" data-admin-modal-trigger>Edit</a>
                                             <form method="POST" action="{{ route('dashboard.product-categories.destroy', $category) }}" onsubmit="return confirm('Hapus kategori ini?')">
                                                 @csrf
                                                 @method('DELETE')
@@ -50,7 +59,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="px-6 py-8 text-center text-sm text-gray-500">Belum ada kategori.</td>
+                                    <td colspan="4" class="px-6 py-8 text-center text-sm text-gray-500">Kategori tidak ditemukan.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -61,4 +70,8 @@
             {{ $categories->links() }}
         </div>
     </div>
+
+    <dialog class="admin-modal-dialog" data-admin-modal aria-labelledby="admin-modal-title">
+        <div class="admin-modal-panel" data-admin-modal-content></div>
+    </dialog>
 </x-app-layout>
