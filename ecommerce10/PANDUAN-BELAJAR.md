@@ -351,7 +351,86 @@ Jawaban singkat untuk ujian:
 > Route menghubungkan URL dan method HTTP ke controller. Middleware `auth` dan
 > `admin` membatasi fitur tersebut kepada admin yang sudah login.
 
-## 12. Pertanyaan latihan ujian
+## 12. Tugas 22: edit dan hapus produk serta kategori
+
+Tugas ini menambahkan/menggunakan operasi edit dan hapus untuk produk dan
+kategori. Pada project ini, fitur edit dan hapus sudah terhubung melalui route
+resource di `routes/web.php`; aksesnya hanya untuk pengguna yang login sebagai
+admin.
+
+### Route yang terlibat
+
+| Aksi | Method HTTP | Nama route produk | Nama route kategori |
+|---|---|---|---|
+| Menampilkan form edit | `GET` | `dashboard.products.edit` | `dashboard.product-categories.edit` |
+| Memperbarui data | `PUT` / `PATCH` | `dashboard.products.update` | `dashboard.product-categories.update` |
+| Menghapus data | `DELETE` | `dashboard.products.destroy` | `dashboard.product-categories.destroy` |
+
+Parameter `{product}` atau `{product_category}` pada URL berisi ID record.
+Laravel melakukan **route model binding**: ID tersebut dicari dan object model
+diserahkan ke method controller. Jika record tidak ditemukan, Laravel
+mengembalikan 404.
+
+### Alur edit
+
+1. Tombol **Edit** di tabel membuka route `...edit` untuk record yang dipilih.
+2. Method `edit()` mengambil data record dan menampilkan form dengan nilai lama.
+   Form tersedia sebagai halaman penuh dan modal.
+3. Form menggunakan `POST` HTML dengan `@csrf` dan `@method('PUT')`. Browser
+   form HTML tidak mengirim `PUT` secara langsung; directive Laravel tersebut
+   menambahkan method spoofing agar request diproses sebagai `PUT`.
+4. Method `update()` memvalidasi input sebelum mengubah model.
+5. Jika valid, perubahan disimpan dan pengguna mendapat pesan sukses. Jika tidak
+   valid, Laravel mengembalikan error validasi dan data tidak diperbarui.
+
+Untuk kategori, nama wajib, maksimal 255 karakter, dan harus unik. Pengecekan
+unik mengabaikan kategori yang sedang diedit sehingga pengguna boleh menyimpan
+nama yang sama seperti semula. Slug dibuat ulang dan dijaga agar tidak bentrok.
+
+Untuk produk, kategori harus ada, nama dan deskripsi wajib, stok serta harga
+tidak boleh negatif. Gambar baru bersifat opsional ketika edit. Jika gambar
+diganti, gambar lama yang dikelola aplikasi dihapus setelah gambar baru
+disimpan. Jika gambar tidak diganti, gambar lama tetap digunakan.
+
+### Alur hapus dan perlindungan data
+
+1. Tombol **Hapus** mengirim form `POST` dengan `@csrf` dan `@method('DELETE')`.
+2. Route `...destroy` mengarahkan request ke method `destroy()` controller.
+3. Controller menerima model berdasarkan ID, memeriksa aturan relasi, lalu
+   menghapus record jika diperbolehkan.
+
+Kategori tidak boleh dihapus selama masih memiliki produk. Produk tidak boleh
+dihapus jika sudah tercatat pada pesanan. Perlindungan ini menjaga agar data
+terkait tidak rusak atau kehilangan referensi. Jika penghapusan ditolak, aplikasi
+kembali ke halaman sebelumnya dengan pesan error.
+
+### File yang perlu dibaca
+
+- `app/Http/Controllers/ProductController.php`: `edit()`, `update()`, dan `destroy()`.
+- `app/Http/Controllers/ProductCategoryController.php`: `edit()`, `update()`, dan `destroy()`.
+- `resources/views/admin/products/index.blade.php` dan
+  `resources/views/admin/product_categories/index.blade.php`: tombol Edit/Hapus.
+- `resources/views/admin/products/form.blade.php` dan
+  `resources/views/admin/product_categories/form.blade.php`: form halaman penuh.
+- `resources/views/admin/products/modal-form.blade.php` dan
+  `resources/views/admin/product_categories/modal-form.blade.php`: form modal.
+- `tests/Feature/AdminCatalogTest.php`: test update, validasi, dan penghapusan.
+
+### Jawaban singkat untuk ujian
+
+> Tombol edit membawa ID data ke route edit. Controller mencari data dengan
+> route model binding lalu menampilkan form berisi nilai saat ini. Form mengirim
+> perubahan ke method `update()`, yang memvalidasi sebelum menyimpan. Hapus
+> memakai method `DELETE` dan method `destroy()`. Sebelum menghapus, controller
+> memeriksa apakah produk/kategori masih dipakai data lain.
+
+Verifikasi test yang terkait:
+
+```powershell
+php artisan test --filter=AdminCatalogTest
+```
+
+## 13. Pertanyaan latihan ujian
 
 **Apa bedanya route dan controller?**  
 Route menentukan request masuk ke aksi mana; controller menjalankan logika aksi.
@@ -375,7 +454,7 @@ Supaya fitur administrasi tidak dapat dipakai pengunjung umum atau pengguna bias
 **Apakah keranjang disimpan di tabel `carts`?**  
 Belum. Implementasi `CartController` menyimpan keranjang di session.
 
-## 13. Cara membaca fitur baru
+## 14. Cara membaca fitur baru
 
 Untuk memahami atau menjelaskan fitur, ikuti urutan ini:
 
@@ -390,7 +469,7 @@ Untuk memahami atau menjelaskan fitur, ikuti urutan ini:
 Dengan urutan ini, alur sebuah fitur bisa dijelaskan dari request sampai
 response tanpa harus menghafal setiap baris kode.
 
-## 14. Peta file aplikasi lebih lengkap
+## 15. Peta file aplikasi lebih lengkap
 
 Bagian ini membantu mencari file saat belajar. File yang sudah dijelaskan
 sebelumnya tidak diulang dengan uraian panjang.
@@ -494,7 +573,7 @@ File di `database/migrations/` berfungsi sebagai riwayat struktur database:
 - `tests/Feature/ExampleTest.php` dan `tests/Unit/ExampleTest.php`: contoh test bawaan.
 - `tests/Pest.php` dan `tests/TestCase.php`: konfigurasi dasar Pest/PHPUnit.
 
-## 15. Catatan belajar file konfigurasi
+## 16. Catatan belajar file konfigurasi
 
 - `composer.json`: kebutuhan PHP/package dan script seperti `setup`, `dev`, dan `test`.
 - `package.json`: package frontend dan script `npm run dev` / `npm run build`.

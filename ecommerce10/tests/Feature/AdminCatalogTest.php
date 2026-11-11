@@ -171,6 +171,17 @@ test('category form rejects missing duplicate and oversized names', function () 
         ->assertSessionHasErrors('name');
 });
 
+test('category update rejects a name already used by another category', function () {
+    $category = ProductCategory::where('slug', 'teknologi')->firstOrFail();
+
+    $this->from(route('dashboard.product-categories.edit', $category))
+        ->put(route('dashboard.product-categories.update', $category), ['name' => 'Gaya hidup'])
+        ->assertRedirect(route('dashboard.product-categories.edit', $category))
+        ->assertSessionHasErrors('name');
+
+    expect($category->fresh()->name)->toBe('Teknologi');
+});
+
 test('a category with products cannot be deleted', function () {
     $category = ProductCategory::where('slug', 'teknologi')->firstOrFail();
 
@@ -242,6 +253,27 @@ test('product validation rejects missing fields invalid values and invalid image
         ->post(route('dashboard.products.store'), $invalidProduct)
         ->assertRedirect(route('dashboard.products.create'))
         ->assertSessionHasErrors('image');
+});
+
+test('product update rejects invalid data without changing the existing product', function () {
+    $product = Product::where('slug', 'headphone-studio-one')->firstOrFail();
+    $originalName = $product->name;
+    $originalPrice = $product->price;
+
+    $this->from(route('dashboard.products.edit', $product))
+        ->put(route('dashboard.products.update', $product), [
+            'product_category_id' => 999999,
+            'name' => '',
+            'description' => str_repeat('a', 5001),
+            'stock' => -1,
+            'price' => -1,
+            'image' => UploadedFile::fake()->create('dokumen.pdf', 1, 'application/pdf'),
+        ])
+        ->assertRedirect(route('dashboard.products.edit', $product))
+        ->assertSessionHasErrors(['product_category_id', 'name', 'description', 'stock', 'price', 'image']);
+
+    expect($product->fresh()->name)->toBe($originalName)
+        ->and($product->fresh()->price)->toBe($originalPrice);
 });
 
 test('admin can update and delete a product', function () {
