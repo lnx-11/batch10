@@ -32,6 +32,9 @@ test('dashboard shows product and category totals and the aggregate product clic
         ->assertSee('data-dashboard-orders', false)
         ->assertSee('Data contoh grafik — belum ada pesanan dalam 7 hari terakhir')
         ->assertSee('Latest Orders')
+        ->assertSee('View All Orders')
+        ->assertSee(route('dashboard.orders.index'), false)
+        ->assertSee('>Orders</a>', false)
         ->assertSee('Geser tabel ke samping')
         ->assertSee('untuk melihat kolom lainnya.')
         ->assertSee('admin-orders-scroll', false)
@@ -70,10 +73,134 @@ test('dashboard shows product and category totals and the aggregate product clic
         ->toBe($expectedDailyTotals->all());
 });
 
+test('admin can view all order invoices from the orders navigation page', function () {
+    $customer = User::factory()->create(['name' => 'Pelanggan Riwayat']);
+    $product = Product::where('slug', 'headphone-studio-one')->firstOrFail();
+    $firstInvoice = 'INV-20261111-00000061';
+    $secondInvoice = 'INV-20261111-00000062';
+
+    foreach ([[$firstInvoice, 'pending', 'unpaid'], [$secondInvoice, 'processing', 'paid']] as [$invoiceNumber, $status, $paymentStatus]) {
+        $customer->orders()->create([
+            'invoice_number' => $invoiceNumber,
+            'product_id' => $product->id,
+            'quantity' => 1,
+            'total' => $product->price,
+            'status' => $status,
+            'payment_status' => $paymentStatus,
+        ]);
+    }
+
+    $this->get(route('dashboard.orders.index'))
+        ->assertOk()
+        ->assertSee('Orders')
+        ->assertSee('Latest Orders')
+        ->assertSee('Produk')
+        ->assertSee($firstInvoice)
+        ->assertSee($secondInvoice)
+        ->assertSee('Pelanggan Riwayat')
+        ->assertSee('Headphone Studio One')
+        ->assertSee('1')
+        ->assertSee('admin-order-action-accept', false)
+        ->assertSee('admin-order-action-cancel', false)
+        ->assertSee('Belum diverifikasi')
+        ->assertSee('Terverifikasi')
+        ->assertSee(route('dashboard.orders.index'), false);
+
+    $this->post(route('dashboard.orders.accept', ['invoiceNumber' => $firstInvoice, 'return_to' => 'orders']))
+        ->assertRedirect(route('dashboard.orders.index'))
+        ->assertSessionHas('success');
+
+    $this->assertDatabaseHas('orders', [
+        'invoice_number' => $firstInvoice,
+        'status' => 'processing',
+        'payment_status' => 'paid',
+    ]);
+});
+
+test('customers cannot access the admin orders history', function () {
+    $this->actingAs(User::factory()->create())
+        ->get(route('dashboard.orders.index'))
+        ->assertForbidden();
+});
+
+test('admin can filter orders by date month year and status together', function () {
+    $customer = User::factory()->create();
+    $product = Product::where('slug', 'headphone-studio-one')->firstOrFail();
+    $matchingInvoice = 'INV-20261111-00000063';
+    $wrongStatusInvoice = 'INV-20261111-00000064';
+    $wrongDateInvoice = 'INV-20261111-00000065';
+
+    foreach ([
+        [$matchingInvoice, 'pending', '2026-11-11 10:00:00'],
+        [$wrongStatusInvoice, 'processing', '2026-11-11 11:00:00'],
+        [$wrongDateInvoice, 'pending', '2026-10-11 10:00:00'],
+    ] as [$invoiceNumber, $status, $createdAt]) {
+        $customer->orders()->create([
+            'invoice_number' => $invoiceNumber,
+            'product_id' => $product->id,
+            'quantity' => 1,
+            'total' => $product->price,
+            'status' => $status,
+        ]);
+        DB::table('orders')
+            ->where('invoice_number', $invoiceNumber)
+            ->update(['created_at' => $createdAt, 'updated_at' => $createdAt]);
+    }
+
+    $this->get(route('dashboard.orders.index', [
+        'date' => '2026-11-11',
+        'month' => 11,
+        'year' => 2026,
+        'status' => 'pending',
+    ]))
+        ->assertOk()
+        ->assertSee($matchingInvoice)
+        ->assertDontSee($wrongStatusInvoice)
+        ->assertDontSee($wrongDateInvoice)
+        ->assertSee('value="2026-11-11"', false)
+        ->assertSee('value="11" selected', false)
+        ->assertSee('value="2026"', false)
+        ->assertSee('value="pending" selected', false)
+        ->assertSee('class="admin-reset-button">Reset</a>', false)
+        ->assertSee('class="admin-filter-button">Filter</button>', false)
+        ->assertSee('admin-orders-filter-actions', false)
+        ->assertSee('grid-template-columns: repeat(4, minmax(0, 1fr)) auto', false);
+
+    $filters = [
+        'date' => '2026-11-11',
+        'month' => 11,
+        'year' => 2026,
+        'status' => 'pending',
+    ];
+    $this->post(route('dashboard.orders.accept', [
+        'invoiceNumber' => $matchingInvoice,
+        'return_to' => 'orders',
+    ]), $filters)
+        ->assertRedirect(route('dashboard.orders.index', $filters))
+        ->assertSessionHas('success');
+});
+
+test('orders filters reject invalid date and status input', function () {
+    $this->get(route('dashboard.orders.index', [
+        'date' => 'not-a-date',
+        'month' => 13,
+        'year' => 1800,
+        'status' => 'unknown',
+    ]))
+        ->assertRedirect()
+        ->assertSessionHasErrors(['date', 'month', 'year', 'status']);
+});
+
 test('product clicks are recorded and the latest product orders appear on the dashboard', function () {
     $user = User::factory()->create(['name' => 'Pelanggan Terbaru']);
     $earlierProduct = Product::where('slug', 'headphone-studio-one')->firstOrFail();
     $latestProduct = Product::where('slug', 'kamera-pocket-35')->firstOrFail();
+
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertSee('data-product-click', false)
+        ->assertSee('data-click-url="http://localhost/products/', false)
+        ->assertSee('/click"', false);
 
     $this->postJson(route('products.click', $latestProduct))
         ->assertOk()

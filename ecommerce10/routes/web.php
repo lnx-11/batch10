@@ -65,6 +65,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 Route::prefix('dashboard')->middleware(['auth', 'admin'])->group(function () {
     // Halaman utama dashboard.
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/orders', [DashboardController::class, 'orders'])->name('dashboard.orders.index');
     Route::post('/orders/{invoiceNumber}/accept', [DashboardController::class, 'acceptOrder'])
         ->where('invoiceNumber', 'INV-[0-9]{8}-[0-9]{8}')
         ->name('dashboard.orders.accept');

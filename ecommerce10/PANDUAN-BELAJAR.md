@@ -561,6 +561,29 @@ agar tidak dibuat dua kali:
 - `resources/views/admin/dashboard.blade.php` menampilkan data tersebut;
   `resources/js/app.js` menggambar grafik.
 - `tests/Feature/DashboardTest.php` memeriksa angka dashboard dan pencatatan klik.
+- Admin dapat membuka **Orders** dari navbar atau **View All Orders** pada
+  dashboard untuk melihat riwayat invoice secara lengkap, tidak hanya delapan
+  pesanan terbaru. Halaman riwayat dibatasi untuk admin, memakai pagination,
+  dan dapat difilter berdasarkan tanggal, bulan, tahun, serta status pesanan.
+
+## 14. Tugas 24: klik produk, deployment cPanel, dan pemeriksaan akhir
+
+- Kartu produk pada halaman utama dan katalog menggunakan
+  `data-product-click`; klik dikirim ke route `products.click`, lalu
+  `ProductController::trackClick()` menambah `click_count`. Statistiknya tampil
+  di dashboard dan grafik klik per kategori. `DashboardTest` memastikan kartu
+  produk di halaman utama terhubung ke route klik dan endpoint menambah hitungan.
+- Sebelum deployment, jalankan `php artisan test`, `npm run build`, dan
+  `php artisan migrate:status`. Pastikan semua migration sudah dijalankan pada
+  database target.
+- Deployment cPanel belum dilakukan dari lingkungan lokal ini. Siapkan domain
+  dan document root yang menunjuk ke folder `public` Laravel, database MySQL,
+  versi PHP yang memenuhi `composer.json`, serta konfigurasi `.env` produksi.
+  Jangan unggah `.env`, `vendor`, atau kredensial ke repository publik.
+- Setelah unggah, jalankan dependency/build/migration pada server sesuai akses
+  yang disediakan hosting, atur permission `storage` dan `bootstrap/cache`,
+  buat symbolic link storage bila diperlukan, lalu uji halaman utama, klik
+  produk, checkout, riwayat, dashboard admin, dan halaman Orders melalui domain.
 
 ### File yang berubah untuk alur keranjang dan checkout
 

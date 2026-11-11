@@ -155,7 +155,7 @@
                             <p class="mt-2 inline-flex rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">Data contoh pesanan — belum ada pesanan sebenarnya</p>
                         @endif
                     </div>
-                    <a href="{{ route('dashboard.products.index') }}" class="text-sm font-semibold text-indigo-600 hover:text-indigo-800">Kelola produk <span aria-hidden="true">&rarr;</span></a>
+                    <a href="{{ route('dashboard.orders.index') }}" class="text-sm font-semibold text-indigo-600 hover:text-indigo-800">View All Orders <span aria-hidden="true">&rarr;</span></a>
                 </div>
                 <div class="admin-orders-scroll w-full overflow-x-auto overscroll-x-contain" style="-webkit-overflow-scrolling: touch;" tabindex="0" aria-label="Tabel pesanan terbaru, geser ke samping untuk melihat kolom lainnya">
                     <p class="px-4 pt-3 text-xs text-gray-500 sm:hidden">Geser tabel ke samping <span class="font-semibold text-indigo-600" aria-hidden="true">&rarr;</span> untuk melihat kolom lainnya.</p>

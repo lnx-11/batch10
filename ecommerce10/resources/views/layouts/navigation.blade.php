@@ -9,6 +9,7 @@
             <a href="{{ route('dashboard') }}" @class(['admin-nav-link', 'active' => request()->routeIs('dashboard')])>Dashboard</a>
             <a href="{{ route('dashboard.products.index') }}" @class(['admin-nav-link', 'active' => request()->routeIs('dashboard.products.*')])>Produk</a>
             <a href="{{ route('dashboard.product-categories.index') }}" @class(['admin-nav-link', 'active' => request()->routeIs('dashboard.product-categories.*')])>Kategori</a>
+            <a href="{{ route('dashboard.orders.index') }}" @class(['admin-nav-link', 'active' => request()->routeIs('dashboard.orders.index')])>Orders</a>
         </div>
 
         <div class="admin-nav-actions">
@@ -34,6 +35,7 @@
         <a href="{{ route('dashboard') }}" @class(['admin-nav-link', 'active' => request()->routeIs('dashboard')])>Dashboard</a>
         <a href="{{ route('dashboard.products.index') }}" @class(['admin-nav-link', 'active' => request()->routeIs('dashboard.products.*')])>Produk</a>
         <a href="{{ route('dashboard.product-categories.index') }}" @class(['admin-nav-link', 'active' => request()->routeIs('dashboard.product-categories.*')])>Kategori</a>
+        <a href="{{ route('dashboard.orders.index') }}" @class(['admin-nav-link', 'active' => request()->routeIs('dashboard.orders.index')])>Orders</a>
         <div class="admin-mobile-user">{{ Auth::user()->name }}<br>{{ Auth::user()->email }}</div>
         <a href="{{ route('profile.edit') }}" class="admin-nav-link">Profil</a>
         <form method="POST" action="{{ route('logout') }}" class="admin-logout">

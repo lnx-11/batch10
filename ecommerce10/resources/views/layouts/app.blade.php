@@ -60,8 +60,16 @@
             .store-admin .admin-mobile-menu { display: none; border-top: 1px solid var(--store-border); padding: .75rem 1.25rem 1rem; }
             .store-admin .admin-mobile-menu .admin-nav-link { display: flex; width: 100%; }
             .store-admin .admin-mobile-user { margin: .5rem 0; padding: .75rem .85rem; border-top: 1px solid var(--store-border); color: var(--store-muted); font-size: .9rem; }
-            .store-admin .admin-reset-button { display: inline-flex; min-height: 40px; flex-shrink: 0; align-items: center; justify-content: center; border: 1px solid var(--store-brand); border-radius: 10px; background: var(--store-brand); padding: .5rem 1rem; color: #fff; font-size: .875rem; font-weight: 700; text-decoration: none; transition: background .15s ease, border-color .15s ease; }
-            .store-admin .admin-reset-button:hover { border-color: var(--store-brand-dark); background: var(--store-brand-dark); color: #fff; }
+            .store-admin .admin-reset-button, .store-admin .admin-filter-button { display: inline-flex; height: 40px; min-height: 40px; flex-shrink: 0; align-items: center; justify-content: center; border: 1px solid; border-radius: 10px; padding: 0 1rem; font-size: .875rem; font-weight: 700; line-height: 1; text-decoration: none; transition: background .15s ease, border-color .15s ease; }
+            .store-admin .admin-reset-button { border-color: #dc2626; background: #dc2626; color: #fff; }
+            .store-admin .admin-reset-button:hover { border-color: #b91c1c; background: #b91c1c; color: #fff; }
+            .store-admin .admin-filter-button { border-color: var(--store-brand); background: var(--store-brand); color: #fff; }
+            .store-admin .admin-filter-button:hover { border-color: var(--store-brand-dark); background: var(--store-brand-dark); color: #fff; }
+            .store-admin .admin-orders-filter-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: end; gap: 1rem; }
+            .store-admin .admin-orders-filter-actions { display: flex; height: 40px; align-self: end; gap: .5rem; }
+            .store-admin .admin-orders-filter-actions > * { width: 5.25rem; height: 40px; }
+            .store-admin .admin-orders-filter-actions .admin-filter-button,
+            .store-admin .admin-orders-filter-actions .admin-reset-button { width: 100%; }
             .store-admin .admin-page-heading { border-bottom: 0; background: transparent; box-shadow: none; }
             .store-admin .admin-content { min-height: calc(100vh - 76px); }
             .store-admin .admin-modal-dialog { width: min(94vw, 42rem); max-width: none; max-height: 90vh; overflow: auto; border: 0; border-radius: 20px; padding: 0; background: transparent; color: var(--store-ink); box-shadow: 0 24px 80px rgba(23,32,51,.24); }
@@ -90,6 +98,12 @@
                 .store-admin .admin-nav-links, .store-admin .admin-nav-actions { display: none; }
                 .store-admin .admin-nav-toggle { display: inline-flex; align-items: center; justify-content: center; }
                 .store-admin .admin-mobile-menu { display: block; }
+            }
+            @media (max-width: 639px) {
+                .store-admin .admin-orders-filter-actions { grid-column: 1 / -1; align-self: start; }
+            }
+            @media (min-width: 1024px) {
+                .store-admin .admin-orders-filter-form { grid-template-columns: repeat(4, minmax(0, 1fr)) auto; }
             }
         </style>
     </head>
