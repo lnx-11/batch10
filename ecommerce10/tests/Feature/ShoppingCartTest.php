@@ -106,6 +106,9 @@ test('cart item quantity can be increased and decreased independently', function
 test('the catalog loads products from the database and paginates six products per page', function () {
     $this->get('/products')
         ->assertOk()
+        ->assertSee('Kategori produk')
+        ->assertSee('Teknologi')
+        ->assertSee('Rumah')
         ->assertSee('Headphone Studio One')
         ->assertSee('Kamera Pocket 35')
         ->assertDontSee('Vas Bentuk Sora')

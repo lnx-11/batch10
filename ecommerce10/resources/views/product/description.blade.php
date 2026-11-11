@@ -35,6 +35,16 @@
             .catalog-search-form { flex: 0 1 320px; }
         }
     </style>
+    <section class="mb-4" aria-label="Kategori produk">
+        <h2 class="h6 fw-bold mb-2">Kategori produk</h2>
+        <div class="d-flex flex-wrap gap-2">
+            @forelse ($categories as $category)
+                <span class="category-chip">{{ $category->name }}</span>
+            @empty
+                <span class="text-secondary small">Belum ada kategori produk.</span>
+            @endforelse
+        </div>
+    </section>
     <div id="cart-feedback" class="alert alert-success d-none" role="status"></div>
     @if (session('success'))
         <div class="alert alert-success rounded-3" role="status">{{ session('success') }}</div>

@@ -35,6 +35,9 @@ class ProductController extends Controller
             'search' => ['nullable', 'string', 'max:100'],
         ]);
         $search = trim($filters['search'] ?? '');
+        $categories = ProductCategory::query()
+            ->orderBy('name')
+            ->get();
 
         $products = Product::query()
             ->with('category')
@@ -48,7 +51,7 @@ class ProductController extends Controller
             ->paginate(6)
             ->withQueryString();
 
-        return view('product.description', compact('products', 'search'));
+        return view('product.description', compact('categories', 'products', 'search'));
     }
 
     public function trackClick(Product $product): JsonResponse
