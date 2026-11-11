@@ -7,7 +7,7 @@
 
     <div class="py-8">
         <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-            <form method="POST" action="{{ $product->exists ? route('dashboard.products.update', $product) : route('dashboard.products.store') }}" enctype="multipart/form-data" class="space-y-6 rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800" data-product-image-form data-image-required="{{ $product->exists ? 'false' : 'true' }}">
+            <form method="POST" action="{{ $product->exists ? route('product.update', $product) : route('product.store') }}" enctype="multipart/form-data" class="space-y-6 rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800" data-product-image-form data-image-required="{{ $product->exists ? 'false' : 'true' }}">
                 @csrf
                 @if ($product->exists)
                     @method('PUT')

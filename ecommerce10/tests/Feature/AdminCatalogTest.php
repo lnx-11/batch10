@@ -92,6 +92,43 @@ test('admin can create update and delete a category', function () {
     $this->assertDatabaseMissing('product_categories', ['id' => $category->id]);
 });
 
+test('task route aliases for creating products and categories work', function () {
+    $this->get(route('product.create'))->assertOk();
+    $this->get(route('product-category.create'))->assertOk();
+
+    $this->post(route('product-category.store'), ['name' => 'Peralatan Tugas 21'])
+        ->assertRedirect(route('dashboard.product-categories.index'));
+
+    $categoryId = ProductCategory::where('slug', 'peralatan-tugas-21')->value('id');
+    $image = UploadedFile::fake()->createWithContent(
+        'task-21-product.jpg',
+        File::get(public_path('images/products/headphone-studio.jpg'))
+    );
+    $createdImagePath = null;
+
+    try {
+        $this->post(route('product.store'), [
+            'product_category_id' => $categoryId,
+            'name' => 'Produk Tugas 21',
+            'description' => 'Produk yang dibuat sesuai tugas 21.',
+            'stock' => 12,
+            'price' => 200000,
+            'image' => $image,
+        ])->assertRedirect(route('dashboard.products.index'));
+
+        $product = Product::where('slug', 'produk-tugas-21')->firstOrFail();
+        $createdImagePath = $product->image;
+
+        expect($product->name)->toBe('Produk Tugas 21')
+            ->and($product->product_category_id)->toBe($categoryId)
+            ->and(File::exists(public_path($product->image)))->toBeTrue();
+    } finally {
+        if ($createdImagePath !== null) {
+            File::delete(public_path($createdImagePath));
+        }
+    }
+});
+
 test('admin can load and save category forms in a modal', function () {
     $createResponse = $this->withHeaders(['X-Admin-Modal' => 'true'])
         ->getJson(route('dashboard.product-categories.create'))

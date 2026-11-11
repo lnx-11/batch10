@@ -7,7 +7,7 @@
 
     <div class="py-8">
         <div class="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
-            <form method="POST" action="{{ $category->exists ? route('dashboard.product-categories.update', $category) : route('dashboard.product-categories.store') }}" class="space-y-6 rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800">
+            <form method="POST" action="{{ $category->exists ? route('product-category.update', $category) : route('product-category.store') }}" class="space-y-6 rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800">
                 @csrf
                 @if ($category->exists)
                     @method('PUT')
