@@ -24,6 +24,9 @@
         .site-nav .nav-link:hover, .site-nav .nav-link.active { color:var(--brand); }
         .btn-brand { background:var(--brand); border:1px solid var(--brand); color:#fff; font-weight:700; border-radius:12px; padding:.8rem 1.15rem; }
         .btn-brand:hover { background:var(--brand-dark); border-color:var(--brand-dark); color:#fff; transform:translateY(-1px); }
+        .btn-whatsapp { display:flex; align-items:center; justify-content:center; gap:9px; background:#25d366; border:1px solid #25d366; color:#fff; font-weight:700; border-radius:12px; padding:.8rem 1rem; }
+        .btn-whatsapp:hover { background:#1fbd5b; border-color:#1fbd5b; color:#fff; transform:translateY(-1px); }
+        .whatsapp-icon { width:21px; height:21px; flex:0 0 auto; }
         .btn-outline-brand { border:1px solid #d9d8fa; color:var(--brand); font-weight:700; border-radius:12px; padding:.8rem 1.15rem; }
         .btn-outline-brand:hover { background:#f1f0ff; color:var(--brand-dark); }
         .eyebrow { color:var(--brand); font-size:.78rem; font-weight:800; letter-spacing:.13em; text-transform:uppercase; }
@@ -62,7 +65,15 @@
         .cart-panel { padding:24px; }
         .cart-table th { color:#798198; font-size:.78rem; letter-spacing:.06em; text-transform:uppercase; }
         .cart-table td, .cart-table th { padding:16px 12px; vertical-align:middle; }
+        .order-status-badge { display:inline-block; padding:.35em .65em; border-radius:999px; font-size:.75em; font-weight:700; line-height:1; white-space:nowrap; }
+        .order-status-pending { background:#facc15; color:#422006; }
+        .order-status-processing { background:#2563eb; color:#fff; }
+        .order-status-completed { background:#059669; color:#fff; }
+        .order-status-cancelled { background:#dc2626; color:#fff; }
         .cart-total { border-top:1px solid #eceef4; padding-top:18px; }
+        .account-detail { display:flex; flex-direction:column; gap:5px; height:100%; padding:16px; border:1px solid #eaecf3; border-radius:14px; background:#f8f9fc; }
+        .account-detail span { color:var(--muted); font-size:.85rem; }
+        .account-detail strong { color:var(--ink); }
         .empty-cart { padding:65px 24px; border:1px dashed #d9dce8; border-radius:22px; background:#fff; text-align:center; }
         @media (max-width:767.98px) { .hero { border-radius:22px; } .hero-visual { min-height:240px; } .hero-product { height:210px; } .page-heading { padding-top:25px; } }
     </style>

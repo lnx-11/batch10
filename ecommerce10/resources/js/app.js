@@ -105,7 +105,7 @@ if (clickChartCanvas) {
             labels: JSON.parse(clickChartCanvas.dataset.labels),
             datasets: [{
                 data: JSON.parse(clickChartCanvas.dataset.values),
-                backgroundColor: ['#5146e5', '#16a7a1', '#f3aa45', '#e45d88', '#4b91d1', '#8e65bd'],
+                backgroundColor: ['#facc15', '#2563eb', '#059669', '#dc2626', '#7c3aed', '#db2777'],
                 borderColor: '#fff',
                 borderWidth: 3,
                 hoverOffset: 8,
@@ -128,7 +128,7 @@ if (orderStatusCanvas) {
             labels: JSON.parse(orderStatusCanvas.dataset.labels),
             datasets: [{
                 data: JSON.parse(orderStatusCanvas.dataset.values),
-                backgroundColor: ['#69b9ae', '#e8799a', '#efc75e', '#6ca6df'],
+                backgroundColor: ['#facc15', '#2563eb', '#059669', '#dc2626'],
                 borderColor: '#fff',
                 borderWidth: 3,
                 hoverOffset: 8,

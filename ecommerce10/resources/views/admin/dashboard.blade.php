@@ -8,6 +8,12 @@
 
     <div class="py-8">
         <div class="mx-auto max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
+            @if (session('success'))
+                <div class="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-800" role="status">{{ session('success') }}</div>
+            @endif
+            @if (session('error'))
+                <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-800" role="alert">{{ session('error') }}</div>
+            @endif
             <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 sm:gap-5" aria-label="Ringkasan toko">
                 <article class="flex items-center justify-between rounded-2xl bg-white p-4 shadow-sm sm:p-6">
                     <div>
@@ -87,7 +93,7 @@
                                 <h3 class="text-lg font-bold text-gray-900">Order Status</h3>
                                 <p class="mt-1 text-sm text-gray-500">Ringkasan status pesanan.</p>
                                 @if ($isSampleOrderStatusChart)
-                                    <p class="mt-2 inline-flex rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">Data contoh status — status belum tersedia pada data pesanan</p>
+                                    <p class="mt-2 inline-flex rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">Data contoh status — belum ada pesanan sebenarnya</p>
                                 @endif
                             </div>
                             @if ($isSampleOrderStatusChart)
@@ -102,7 +108,13 @@
                                 </div>
                             @else
                                 <div class="grid h-72 place-items-center rounded-xl bg-gray-50 px-6 text-center text-sm text-gray-500">
-                                    Status pesanan belum tersedia pada data aplikasi.
+                                    <canvas
+                                        aria-label="Grafik status pesanan"
+                                        role="img"
+                                        data-dashboard-order-status
+                                        data-labels="{{ json_encode($orderStatusChart['labels']) }}"
+                                        data-values="{{ json_encode($orderStatusChart['values']) }}"
+                                    ></canvas>
                                 </div>
                             @endif
                         </article>
@@ -147,10 +159,10 @@
                 </div>
                 <div class="admin-orders-scroll w-full overflow-x-auto overscroll-x-contain" style="-webkit-overflow-scrolling: touch;" tabindex="0" aria-label="Tabel pesanan terbaru, geser ke samping untuk melihat kolom lainnya">
                     <p class="px-4 pt-3 text-xs text-gray-500 sm:hidden">Geser tabel ke samping <span class="font-semibold text-indigo-600" aria-hidden="true">&rarr;</span> untuk melihat kolom lainnya.</p>
-                    <table class="w-full min-w-[1000px] divide-y divide-gray-200">
+                    <table class="w-full min-w-[1120px] divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th scope="col" class="sticky left-0 z-10 whitespace-nowrap bg-gray-50 px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 shadow-[2px_0_6px_-3px_rgba(23,32,51,0.25)] sm:px-6">Order ID</th>
+                                <th scope="col" class="sticky left-0 z-10 whitespace-nowrap bg-gray-50 px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 shadow-[2px_0_6px_-3px_rgba(23,32,51,0.25)] sm:px-6">Invoice</th>
                                 <th scope="col" class="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 sm:px-6">Produk</th>
                                 <th scope="col" class="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 sm:px-6">Pelanggan</th>
                                 <th scope="col" class="whitespace-nowrap px-4 py-3 text-right text-xs font-semibold uppercase text-gray-500 sm:px-6">Jumlah</th>
@@ -158,6 +170,7 @@
                                 <th scope="col" class="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 sm:px-6">Status</th>
                                 <th scope="col" class="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 sm:px-6">Status Pembayaran</th>
                                 <th scope="col" class="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 sm:px-6">Tanggal</th>
+                                <th scope="col" class="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 sm:px-6">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 bg-white">
@@ -171,10 +184,32 @@
                                     <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-700 sm:px-6">{{ $order['status'] }}</td>
                                     <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-700 sm:px-6">{{ $order['payment_status'] }}</td>
                                     <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-600 sm:px-6">{{ $order['created_at']?->format('d M Y | H:i') ?? '-' }}</td>
+                                    <td class="whitespace-nowrap px-4 py-4 text-sm sm:px-6">
+                                        @if ($order['is_cancelled'])
+                                            <span class="text-xs font-medium text-red-700" role="status">Pesanan Dibatalkan</span>
+                                        @elseif ($order['can_verify_payment'])
+                                            <div class="flex flex-col items-stretch gap-2">
+                                                <form method="POST" action="{{ route('dashboard.orders.accept', $order['id']) }}" onsubmit="return confirm('Pastikan kamu sudah memeriksa bukti transfer atau konfirmasi pembayaran pelanggan di WhatsApp.')">
+                                                    @csrf
+                                                    <button type="submit" class="admin-order-action admin-order-action-accept">Terima pesanan</button>
+                                                </form>
+                                                <form method="POST" action="{{ route('dashboard.orders.cancel', $order['id']) }}" onsubmit="return confirm('Yakin ingin membatalkan invoice ini? Status semua item akan menjadi Cancelled dan stok dikembalikan.')">
+                                                    @csrf
+                                                    <button type="submit" class="admin-order-action admin-order-action-cancel">Batalkan pesanan</button>
+                                                </form>
+                                            </div>
+                                        @elseif ($order['status'] === 'Completed')
+                                            <span class="text-xs font-medium text-green-700" role="status">Pesanan Selesai</span>
+                                        @elseif ($order['payment_status'] === 'Terverifikasi')
+                                            <span class="text-xs font-medium text-green-700">Diverifikasi Admin</span>
+                                        @else
+                                            <span class="text-xs text-gray-500">-</span>
+                                        @endif
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="px-6 py-10 text-center text-sm text-gray-500">Belum ada pesanan produk.</td>
+                                    <td colspan="9" class="px-6 py-10 text-center text-sm text-gray-500">Belum ada pesanan produk.</td>
                                 </tr>
                             @endforelse
                         </tbody>

@@ -10,12 +10,16 @@
             <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
                 <li class="nav-item"><a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">Beranda</a></li>
                 <li class="nav-item"><a class="nav-link {{ request()->is('products*') ? 'active' : '' }}" href="{{ url('products') }}">Produk</a></li>
-                <li class="nav-item"><a class="nav-link {{ request()->is('cart*') ? 'active' : '' }}" href="{{ auth()->check() ? route('cart.index') : route('login') }}">Keranjang <span class="badge rounded-pill text-bg-primary ms-1" data-cart-count>{{ array_sum(session('cart', [])) }}</span></a></li>
+                <li class="nav-item"><a class="nav-link {{ request()->is('cart*') ? 'active' : '' }}" href="{{ auth()->check() ? route('cart.index') : route('login') }}">Keranjang <span class="badge rounded-pill text-bg-primary ms-1" data-cart-count>{{ auth()->check() ? auth()->user()->cartItems()->sum('quantity') : 0 }}</span></a></li>
                 @guest
                     <li class="nav-item"><a class="nav-link" href="{{ route('login') }}">Login</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ route('register') }}">Register</a></li>
                 @else
-                    <li class="nav-item"><a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('purchases.*') ? 'active' : '' }}" href="{{ route('purchases.index') }}">Riwayat</a></li>
+                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}" href="{{ route('profile.edit') }}">Profil</a></li>
+                    @if (auth()->user()->isAdmin())
+                        <li class="nav-item"><a class="nav-link {{ request()->routeIs('dashboard*') ? 'active' : '' }}" href="{{ route('dashboard') }}">Dashboard</a></li>
+                    @endif
                     <li class="nav-item">
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

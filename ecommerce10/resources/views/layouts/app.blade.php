@@ -77,6 +77,11 @@
             .store-admin .admin-orders-scroll::-webkit-scrollbar-track { border-radius: 999px; background: #f1f2f7; }
             .store-admin .admin-orders-scroll::-webkit-scrollbar-thumb { border: 2px solid #f1f2f7; border-radius: 999px; background: #a5a9bd; }
             .store-admin .admin-orders-scroll::-webkit-scrollbar-thumb:hover { background: var(--store-brand); }
+            .store-admin .admin-order-action { display: inline-flex; width: 100%; min-height: 38px; align-items: center; justify-content: center; border-radius: 10px; padding: .5rem .75rem; font-size: .75rem; font-weight: 700; line-height: 1.25; white-space: nowrap; box-shadow: 0 2px 5px rgba(23,32,51,.12); transition: background-color .15s ease, border-color .15s ease, transform .15s ease; }
+            .store-admin .admin-order-action-accept { border: 1px solid #15803d !important; background-color: #15803d !important; color: #fff !important; }
+            .store-admin .admin-order-action-accept:hover { border-color: #166534 !important; background-color: #166534 !important; color: #fff !important; }
+            .store-admin .admin-order-action-cancel { border: 1px solid #eab308 !important; background-color: #eab308 !important; color: #422006 !important; }
+            .store-admin .admin-order-action-cancel:hover { border-color: #ca8a04 !important; background-color: #ca8a04 !important; color: #422006 !important; }
             .store-admin input:not([type="checkbox"]):not([type="file"]), .store-admin select, .store-admin textarea { border-color: #d9dce8; border-radius: 11px; background-color: #fff; color: var(--store-ink); }
             .store-admin input[type="file"] { color: var(--store-muted); }
             .store-admin input[type="checkbox"] { accent-color: var(--store-brand); }

@@ -16,8 +16,12 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $user = $request->user();
+        $user->loadCount('orders');
+
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $user,
+            'layout' => $user->isAdmin() ? 'admin' : 'storefront',
         ]);
     }
 

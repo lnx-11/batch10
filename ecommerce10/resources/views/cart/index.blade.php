@@ -8,6 +8,9 @@
     @if (session('success'))
         <div class="alert alert-success rounded-3" role="status">{{ session('success') }}</div>
     @endif
+    @if (session('error'))
+        <div class="alert alert-danger rounded-3" role="alert">{{ session('error') }}</div>
+    @endif
 
     @if (empty($items))
         <div class="empty-cart">
@@ -27,8 +30,15 @@
                             <tbody>
                                 @foreach ($items as $item)
                                     <tr>
-                                        <td class="fw-bold">{{ $item['name'] }}</td>
-                                        <td class="text-secondary">Rp {{ number_format($item['price'], 0, ',', '.') }}</td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-3">
+                                                @if ($item['image'])
+                                                    <img src="{{ asset($item['image']) }}" alt="" class="rounded-3" style="width:56px;height:56px;object-fit:cover">
+                                                @endif
+                                                <span class="fw-bold">{{ $item['name'] }}</span>
+                                            </div>
+                                        </td>
+                                        <td class="text-secondary text-nowrap">Rp {{ number_format($item['price'], 0, ',', '.') }}</td>
                                         <td>
                                             <div class="d-flex align-items-center gap-2">
                                                 <form action="{{ route('cart.quantity', $item['id']) }}" method="POST">
@@ -44,7 +54,7 @@
                                                 </form>
                                             </div>
                                         </td>
-                                        <td class="text-end fw-bold">Rp {{ number_format($item['price'] * $item['qty'], 0, ',', '.') }}</td>
+                                        <td class="text-end fw-bold text-nowrap">Rp {{ number_format($item['price'] * $item['qty'], 0, ',', '.') }}</td>
                                         <td class="text-end">
                                             <form action="{{ route('cart.remove', $item['id']) }}" method="POST">
                                                 @csrf
@@ -63,7 +73,7 @@
                     <h2 class="h5 fw-bold mb-4">Ringkasan pesanan</h2>
                     <div class="d-flex justify-content-between text-secondary mb-3"><span>Total item</span><span>{{ collect($items)->sum('qty') }} item</span></div>
                     <div class="cart-total d-flex justify-content-between align-items-center mb-4"><span class="fw-bold">Total harga</span><span class="product-price">Rp {{ number_format(collect($items)->sum(fn ($i) => $i['price'] * $i['qty']), 0, ',', '.') }}</span></div>
-                    <a href="{{ url('checkout') }}" class="btn btn-brand w-100">Lanjut checkout <span aria-hidden="true">&rarr;</span></a>
+                    <a href="{{ route('checkout.index') }}" class="btn btn-brand w-100">Lanjut checkout <span aria-hidden="true">&rarr;</span></a>
                     <a href="{{ url('products') }}" class="btn btn-outline-brand w-100 mt-2">Lanjut belanja</a>
                 </div>
             </div>

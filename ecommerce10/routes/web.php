@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\CartController;
-use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\OrderHistoryController;
 use App\Http\Controllers\ProductCategoryController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -63,7 +65,12 @@ Route::middleware(['auth', 'admin'])->group(function () {
 Route::prefix('dashboard')->middleware(['auth', 'admin'])->group(function () {
     // Halaman utama dashboard.
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-
+    Route::post('/orders/{invoiceNumber}/accept', [DashboardController::class, 'acceptOrder'])
+        ->where('invoiceNumber', 'INV-[0-9]{8}-[0-9]{8}')
+        ->name('dashboard.orders.accept');
+    Route::post('/orders/{invoiceNumber}/cancel', [DashboardController::class, 'cancelOrder'])
+        ->where('invoiceNumber', 'INV-[0-9]{8}-[0-9]{8}')
+        ->name('dashboard.orders.cancel');
     // Route CRUD produk dan kategori, kecuali halaman detail (show).
     Route::resource('products', ProductController::class)
         ->except('show')
@@ -82,13 +89,22 @@ Route::prefix('dashboard')->middleware(['auth', 'admin'])->group(function () {
 | PATCH untuk pembaruan sebagian data dan DELETE untuk menghapus akun.
 */
 Route::middleware('auth')->group(function () {
+    Route::get('/riwayat-pembelian', [OrderHistoryController::class, 'index'])->name('purchases.index');
+    Route::get('/riwayat-pembelian/{invoiceNumber}', [OrderHistoryController::class, 'show'])
+        ->where('invoiceNumber', 'INV-[0-9]{8}-[0-9]{8}')
+        ->name('purchases.show');
+    Route::post('/riwayat-pembelian/{invoiceNumber}/cancel', [OrderHistoryController::class, 'cancel'])
+        ->where('invoiceNumber', 'INV-[0-9]{8}-[0-9]{8}')
+        ->name('purchases.cancel');
+    Route::post('/riwayat-pembelian/{invoiceNumber}/complete', [OrderHistoryController::class, 'complete'])
+        ->where('invoiceNumber', 'INV-[0-9]{8}-[0-9]{8}')
+        ->name('purchases.complete');
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/{product}', [CartController::class, 'store'])->name('cart.store');
     Route::post('/cart/{product}/quantity', [CartController::class, 'updateQuantity'])->name('cart.quantity');
     Route::post('/cart/{product}/remove', [CartController::class, 'remove'])->name('cart.remove');
-
-    // Placeholder sementara; route ini hanya mengembalikan teks Checkout page.
-    Route::get('/checkout', fn () => response('Checkout page'));
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

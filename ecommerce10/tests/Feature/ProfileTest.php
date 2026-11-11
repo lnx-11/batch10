@@ -10,9 +10,21 @@ test('profile page is displayed', function () {
         ->get('/profile');
 
     $response->assertOk()
-        ->assertSee('aria-controls="update_password_current_password"', false)
-        ->assertSee('aria-controls="update_password_password"', false)
-        ->assertSee('aria-controls="update_password_password_confirmation"', false);
+        ->assertSee('Profil saya.')
+        ->assertSee('Informasi pribadi')
+        ->assertSee('Ubah kata sandi')
+        ->assertSee('Hapus akun')
+        ->assertSee('class="navbar navbar-expand-lg site-nav', false)
+        ->assertDontSee('class="admin-navigation"', false)
+        ->assertSee('name="current_password"', false);
+});
+
+test('admin profile continues to use the admin layout', function () {
+    $this->actingAs(User::factory()->admin()->create())
+        ->get('/profile')
+        ->assertOk()
+        ->assertSee('class="admin-navigation"', false)
+        ->assertDontSee('Profil saya.');
 });
 
 test('dashboard resource routes are protected and use the dashboard prefix', function () {

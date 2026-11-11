@@ -2,35 +2,31 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CartController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $quantities = session('cart', []);
-        $products = Product::query()
-            ->whereIn('id', array_keys($quantities))
+        $user = $this->authenticatedUser($request);
+        $items = $user->cartItems()
+            ->with('product')
             ->get()
-            ->keyBy('id');
-
-        $items = collect($quantities)
-            ->map(function (int $quantity, int $productId) use ($products) {
-                $product = $products->get($productId);
-
-                return $product ? [
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'price' => $product->price,
-                    'qty' => $quantity,
-                ] : null;
-            })
-            ->filter()
-            ->values()
+            ->map(fn (Cart $item): array => [
+                'id' => $item->product_id,
+                'name' => $item->product->name,
+                'price' => $item->product->price,
+                'image' => $item->product->image,
+                'stock' => $item->product->stock,
+                'qty' => $item->quantity,
+            ])
             ->all();
 
         return view('cart.index', compact('items'));
@@ -38,14 +34,35 @@ class CartController extends Controller
 
     public function store(Request $request, Product $product): JsonResponse|RedirectResponse
     {
-        abort_if($product->stock < 1, 404, 'Produk sedang habis.');
+        $user = $this->authenticatedUser($request);
+        $message = DB::transaction(function () use ($user, $product): ?string {
+            $currentProduct = Product::query()->lockForUpdate()->findOrFail($product->id);
+            abort_if($currentProduct->stock < 1, 404, 'Produk sedang habis.');
 
-        $cart = $request->session()->get('cart', []);
-        $currentQuantity = $cart[$product->id] ?? 0;
+            $cartItem = $user->cartItems()
+                ->where('product_id', $currentProduct->id)
+                ->lockForUpdate()
+                ->first();
+            $currentQuantity = $cartItem?->quantity ?? 0;
+            $maximumQuantity = min($currentProduct->stock, 99);
 
-        if ($currentQuantity >= min($product->stock, 99)) {
-            $message = 'Jumlah produk sudah mencapai stok yang tersedia.';
+            if ($currentQuantity >= $maximumQuantity) {
+                return 'Jumlah produk sudah mencapai stok yang tersedia.';
+            }
 
+            if ($cartItem === null) {
+                $user->cartItems()->create([
+                    'product_id' => $currentProduct->id,
+                    'quantity' => 1,
+                ]);
+            } else {
+                $cartItem->increment('quantity');
+            }
+
+            return null;
+        });
+
+        if ($message !== null) {
             if ($request->expectsJson()) {
                 return response()->json(['message' => $message], 422);
             }
@@ -53,14 +70,12 @@ class CartController extends Controller
             return back()->with('error', $message);
         }
 
-        $cart[$product->id] = $currentQuantity + 1;
-        $request->session()->put('cart', $cart);
         $message = $product->name.' ditambahkan ke keranjang.';
 
         if ($request->expectsJson()) {
             return response()->json([
                 'message' => $message,
-                'cartCount' => array_sum($cart),
+                'cartCount' => $user->cartItems()->sum('quantity'),
             ]);
         }
 
@@ -70,30 +85,54 @@ class CartController extends Controller
     public function updateQuantity(Request $request, Product $product): RedirectResponse
     {
         $validated = $request->validate(['delta' => ['required', 'integer', 'in:-1,1']]);
-        $cart = $request->session()->get('cart', []);
-        $quantity = ($cart[$product->id] ?? 0) + $validated['delta'];
+        $user = $this->authenticatedUser($request);
+        $result = DB::transaction(function () use ($user, $product, $validated): array {
+            $currentProduct = Product::query()->lockForUpdate()->findOrFail($product->id);
+            $cartItem = $user->cartItems()
+                ->where('product_id', $currentProduct->id)
+                ->lockForUpdate()
+                ->first();
 
-        if ($quantity < 1) {
-            unset($cart[$product->id]);
-            $message = 'Produk dihapus dari keranjang.';
-        } elseif ($quantity > min($product->stock, 99)) {
-            $message = 'Jumlah produk sudah mencapai stok yang tersedia.';
-        } else {
-            $cart[$product->id] = $quantity;
-            $message = 'Jumlah produk diperbarui.';
-        }
+            if ($cartItem === null) {
+                return ['status' => 'error', 'message' => 'Produk tidak ditemukan di keranjang.'];
+            }
 
-        $request->session()->put('cart', $cart);
+            $quantity = $cartItem->quantity + $validated['delta'];
 
-        return back()->with('success', $message);
+            if ($quantity < 1) {
+                $cartItem->delete();
+
+                return ['status' => 'success', 'message' => 'Produk dihapus dari keranjang.'];
+            }
+
+            if ($quantity > min($currentProduct->stock, 99)) {
+                return ['status' => 'error', 'message' => 'Jumlah produk sudah mencapai stok yang tersedia.'];
+            }
+
+            $cartItem->update(['quantity' => $quantity]);
+
+            return ['status' => 'success', 'message' => 'Jumlah produk diperbarui.'];
+        });
+
+        return back()->with($result['status'], $result['message']);
     }
 
     public function remove(Request $request, Product $product): RedirectResponse
     {
-        $cart = $request->session()->get('cart', []);
-        unset($cart[$product->id]);
-        $request->session()->put('cart', $cart);
+        $user = $this->authenticatedUser($request);
+        $deleted = $user->cartItems()->where('product_id', $product->id)->delete();
 
-        return back()->with('success', 'Produk dihapus dari keranjang.');
+        return back()->with(
+            $deleted > 0 ? 'success' : 'error',
+            $deleted > 0 ? 'Produk dihapus dari keranjang.' : 'Produk tidak ditemukan di keranjang.',
+        );
+    }
+
+    private function authenticatedUser(Request $request): User
+    {
+        $user = $request->user();
+        abort_unless($user instanceof User, 401);
+
+        return $user;
     }
 }

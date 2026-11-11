@@ -13,7 +13,7 @@ terlihat di source meliputi:
 
 - Halaman beranda dan katalog produk.
 - Login, registrasi, pengelolaan profil, dan autentikasi Laravel Breeze.
-- Keranjang belanja yang disimpan di session.
+- Keranjang belanja yang tersimpan per pengguna di database.
 - Pengelolaan produk dan kategori khusus admin.
 - Dashboard berisi ringkasan toko dan grafik.
 - Pengujian otomatis dengan Pest.
@@ -75,7 +75,7 @@ Kode utama aplikasi:
 
 ### `routes/`
 
-- [`routes/web.php`](routes/web.php): route halaman toko, dashboard, katalog, keranjang, dan profil.
+- [`routes/web.php`](routes/web.php): route halaman toko, dashboard, katalog, keranjang, riwayat pembelian, dan profil.
 - [`routes/auth.php`](routes/auth.php): route login, registrasi, logout, reset password, dan verifikasi email.
 - `routes/console.php`: tempat mendefinisikan perintah Artisan berbasis closure.
 - `routes/web.old.php`: salinan/versi lama; tidak didaftarkan sebagai route aktif pada bootstrap saat ini.
@@ -141,7 +141,7 @@ bernama pendek dan route dashboard mengarah ke controller yang sama.
 `dashboard` menambahkan bagian `/dashboard` pada URL dalam group tersebut.
 
 Route toko umum seperti beranda/katalog tidak berada di group admin. Fitur
-keranjang dan profil memerlukan `auth`. Route autentikasi dimuat dari
+keranjang, checkout, dan profil memerlukan `auth`. Route autentikasi dimuat dari
 [`routes/auth.php`](routes/auth.php).
 
 ## 5. Controller dan alur fitur
@@ -183,15 +183,29 @@ File: [`app/Http/Controllers/ProductCategoryController.php`](app/Http/Controller
 
 File: [`app/Http/Controllers/CartController.php`](app/Http/Controllers/CartController.php)
 
-Keranjang saat ini disimpan di session, bukan melalui model/tabel `carts`.
-Session menyimpan pasangan ID produk dan jumlahnya. Controller:
+Keranjang disimpan pada tabel `carts` per pengguna yang login. Controller:
 
-- `index()`: membaca keranjang session, mengambil produk, dan menyiapkan data view.
+- `index()`: mengambil item milik pengguna login beserta data produknya.
 - `store()`: menambahkan satu produk jika stok tersedia dan batas jumlah belum tercapai.
-- `updateQuantity()`: menambah/mengurangi jumlah setelah memvalidasi perubahan.
-- `remove()`: menghapus produk dari session keranjang.
+- `updateQuantity()`: mengubah jumlah setelah memvalidasi perubahan dan stok.
+- `remove()`: menghapus produk dari keranjang pengguna yang sedang login.
 
 Respons bisa berupa redirect untuk form biasa atau JSON untuk request AJAX.
+
+### Checkout — `CheckoutController`
+
+File: [`app/Http/Controllers/CheckoutController.php`](app/Http/Controllers/CheckoutController.php)
+
+- `index()`: menampilkan rincian dan total barang milik pengguna yang login.
+- `store()`: memeriksa stok terbaru, membuat baris pesanan, mengurangi stok,
+  mengosongkan keranjang, lalu membuka WhatsApp dengan pesan konfirmasi.
+- Seluruh perubahan database checkout dilakukan dalam satu transaksi agar
+  pesanan, stok, dan keranjang tidak tertinggal dalam keadaan parsial.
+
+Nomor tujuan WhatsApp dibaca dari `WHATSAPP_PHONE`. Isi dengan kode negara dan
+angka saja, misalnya `6281234567890`. Jika masih kosong, tautan WhatsApp tetap
+membuka dengan teks pesanan yang telah disiapkan dan pengguna dapat memilih
+tujuan sendiri.
 
 ### Dashboard — `DashboardController`
 
@@ -201,6 +215,18 @@ Mengambil jumlah produk, kategori, pengguna, klik, pendapatan, data pesanan, dan
 data grafik lalu mengirimkannya ke `admin/dashboard.blade.php`. Jika belum ada
 pesanan/klik, sebagian grafik menampilkan data contoh dan view memberi label
 bahwa data tersebut adalah contoh.
+
+### Riwayat pembelian — `OrderHistoryController`
+
+File: [`app/Http/Controllers/OrderHistoryController.php`](app/Http/Controllers/OrderHistoryController.php)
+
+Mengambil pesanan melalui relasi milik pengguna yang sedang login, memuat data
+produk, mengelompokkan semua item berdasarkan nomor invoice, dan menampilkan
+riwayat terbaru dengan pagination. Halaman detail invoice juga menampilkan item
+pesanan dan tautan WhatsApp. Method `cancel()` membatalkan hanya invoice milik
+pengguna yang masih berstatus `pending`, mengubah seluruh item invoice menjadi
+`cancelled`, dan mengembalikan stok dalam satu transaksi. Pengguna tidak dapat
+melihat atau membatalkan pesanan akun lain.
 
 ### Controller lain
 
@@ -222,8 +248,14 @@ bahwa data tersebut adalah contoh.
   menyatakan satu kategori memiliki banyak produk.
 - [`User`](app/Models/User.php): akun pengguna Laravel; `isAdmin()` memeriksa
   apakah role pengguna adalah `admin`. Password di-hash lewat cast `hashed`.
+  Relasi `cartItems()` mengambil keranjang dan `orders()` mengambil pesanan milik
+  akun tersebut.
 - [`Order`](app/Models/Order.php): memiliki relasi ke pengguna dan produk.
-- `Cart` dan `OrderItem`: model masih kosong/minimal pada kondisi source sekarang.
+  `invoice_number` menghubungkan beberapa baris produk dari checkout yang sama;
+  `status` mencatat `pending`, `processing`, `completed`, atau `cancelled`.
+- [`Cart`](app/Models/Cart.php): satu baris untuk satu produk di keranjang seorang
+  pengguna; memiliki relasi ke `User` dan `Product`.
+- `OrderItem`: model masih kosong/minimal pada kondisi source sekarang.
 
 Relasi kategori-produk dapat dibaca sebagai:
 
@@ -251,6 +283,9 @@ Model tidak otomatis membuat tabel. Struktur tabel dibuat oleh migration.
 - `home/index.blade.php`: beranda dan produk pilihan.
 - `product/description.blade.php`: katalog dan pencarian produk.
 - `cart/index.blade.php`: isi keranjang, ubah jumlah, hapus produk, dan ringkasan.
+- `checkout/index.blade.php`: rincian sebelum checkout dan tombol WhatsApp.
+- `purchases/index.blade.php` dan `purchases/show.blade.php`: daftar invoice
+  serta detail produk dan total tiap invoice.
 - `admin/dashboard.blade.php`: kartu ringkasan dan grafik dashboard.
 - `admin/products/`: tabel, form tambah/edit, dan form modal produk.
 - `admin/product_categories/`: tabel, form tambah/edit, dan form modal kategori.
@@ -279,9 +314,10 @@ bernama dengan `route(...)`.
 ## 9. Database, migration, dan seed
 
 Migration utama membangun tabel pengguna, kategori, produk, keranjang, pesanan,
-dan item pesanan. Migration tambahan menambahkan penghitung klik produk dan role
-pengguna. Foreign key menjaga hubungan data; misalnya kategori produk tidak
-bisa dihapus jika masih dipakai produk.
+dan item pesanan. Migration tambahan menambahkan penghitung klik produk, role
+pengguna, dan relasi pemilik/produk/jumlah pada tabel keranjang. Foreign key
+menjaga hubungan data; misalnya kategori produk tidak bisa dihapus jika masih
+dipakai produk.
 
 Seeder:
 
@@ -293,15 +329,46 @@ Seeder:
 
 ### Catatan penting tentang bagian yang belum lengkap
 
-- Tabel `carts` yang ada pada migration saat ini hanya memiliki ID dan timestamps;
-  keranjang aplikasi aktif disimpan di session.
+- Tabel `carts` menyimpan pengguna, produk, dan jumlah. Keranjang setiap akun
+  terpisah dan tetap ada setelah pengguna berpindah halaman atau login kembali.
 - Tabel `order_items` saat ini juga hanya memiliki ID dan timestamps.
-- Checkout route saat ini hanya mengembalikan teks sementara, belum memproses
-  pembayaran atau membuat pesanan.
+- Checkout mencatat satu baris di tabel `orders` untuk setiap produk; semua
+  baris dalam satu checkout berbagi `invoice_number`. Stok dikurangi dan pesan
+  konfirmasi WhatsApp disiapkan. Pengguna bisa melihat invoice di riwayat;
+  pembayaran online dan status konfirmasi dari toko belum diproses aplikasi.
+- Pengguna boleh membatalkan invoice hanya saat statusnya `pending`. Pembatalan
+  mengubah status semua produk di invoice dan mengembalikan stok. Invoice
+  berstatus `processing` atau `completed` tidak dapat dibatalkan oleh pengguna.
+- Aplikasi belum terhubung ke payment gateway atau WhatsApp API, sehingga
+  aplikasi tidak bisa mengetahui apakah pelanggan benar-benar membayar atau
+  mengirim pesan WhatsApp. Checkout baru dan pesanan lama yang belum diverifikasi
+  berstatus `pending`.
+- Di dashboard bagian Latest Orders, admin memilih **Terima pesanan** setelah
+    memeriksa bukti transfer/mutasi atau konfirmasi pelanggan di WhatsApp. Aksi
+    ini menyimpan admin dan waktu verifikasi, mengubah pembayaran menjadi `paid`,
+    serta status pesanan menjadi `processing`. Admin juga dapat memilih
+    **Batalkan** berwarna kuning selama status masih `pending`; seluruh item
+    invoice menjadi `cancelled` dan stok dikembalikan satu kali. Pesanan yang
+    sudah dibatalkan ditampilkan sebagai teks merah **Pesanan Dibatalkan**, bukan
+    tombol aksi. Setelah admin memverifikasi pembayaran, pelanggan dapat melihat
+    pesanan berstatus `processing`. Jika barang sudah diterima, pelanggan sendiri
+    menekan **Konfirmasi pesanan diterima** di detail invoice. Status semua item
+    berubah menjadi `completed`; tombol hanya tersedia untuk invoice yang semua
+    itemnya berstatus `processing` dan pembayarannya sudah diverifikasi. Jika
+    pelanggan belum mengonfirmasi, command `orders:complete-expired` mengubah
+    invoice menjadi `completed` setelah lebih dari 5 hari sejak admin memulai
+    pemrosesan (`payment_verified_at`). Pemeriksaan otomatis dijalankan setiap
+    jam, sehingga perubahan dapat terjadi pada pemeriksaan berikutnya. Jalankan
+    `php artisan schedule:work` selama pengembangan lokal; server produksi harus
+    memanggil `php artisan schedule:run` secara berkala melalui cron atau Windows
+    Task Scheduler. Aksi penerimaan dan pembatalan admin memerlukan pemeriksaan
+    manual; aplikasi tidak terhubung ke bank/payment gateway. Warna status
+    pesanan dibuat konsisten: Pending kuning, Processing biru, Completed hijau
+    kebiruan, dan Cancelled merah.
 - Controller `OrderController` dan `OrderItemController` masih berupa kerangka.
 
-Catatan tersebut menjelaskan kondisi implementasi sekarang, bukan menyatakan
-bahwa fitur checkout/pesanan sudah selesai.
+Catatan tersebut menjelaskan batas fitur pesanan yang belum tersedia, bukan
+berarti pencatatan checkout atau riwayat pembelian tidak berfungsi.
 
 ## 10. Pengujian
 
@@ -309,10 +376,12 @@ Project memakai Pest dan PHPUnit. Pengujian feature penting antara lain:
 
 - `AdminCatalogTest`: daftar, pencarian, filter, CRUD produk/kategori, validasi,
   upload gambar, modal, dan proteksi penghapusan.
-- `ShoppingCartTest`: keranjang session, autentikasi, katalog, serta perubahan
-  jumlah dan penghapusan item.
+- `ShoppingCartTest`: keranjang per pengguna, autentikasi, katalog, perubahan
+  jumlah, penghapusan item, checkout, dan konfirmasi WhatsApp.
 - `DashboardTest`: ringkasan dashboard dan pencatatan klik.
 - `ProfileTest`: proteksi route dashboard dan alur profil.
+- `PurchaseHistoryTest`: riwayat pesanan per akun, tampilan kosong, informasi
+  profil, dan tautan navigasi.
 - `Auth/*Test`: login, registrasi, reset password, konfirmasi password, dan
   verifikasi email.
 - `DatabaseSeederTest`: data awal kategori dan produk.
@@ -327,6 +396,12 @@ Untuk test katalog/admin saja:
 
 ```powershell
 php artisan test --filter=AdminCatalogTest
+```
+
+Untuk test keranjang dan checkout:
+
+```powershell
+php artisan test --filter=ShoppingCartTest
 ```
 
 Test feature biasanya memakai database yang di-refresh agar data uji tidak
@@ -430,7 +505,130 @@ Verifikasi test yang terkait:
 php artisan test --filter=AdminCatalogTest
 ```
 
-## 13. Pertanyaan latihan ujian
+## 13. Tugas 23: keranjang, checkout, WhatsApp, riwayat, dan dashboard
+
+### Instruksi keranjang (gambar 1–5)
+
+1. **Keranjang berdasarkan pengguna login:** data disimpan di `carts` dengan
+   `user_id`, `product_id`, dan `quantity`. Relasi `User::cartItems()` memastikan
+   setiap akun hanya membaca keranjangnya sendiri.
+2. **Ubah jumlah dan hapus:** tombol plus/minus mengirim perubahan ke route
+   `cart.quantity`; tombol hapus ke `cart.remove`. Controller membatasi jumlah
+   dengan stok produk, dan query selalu dibatasi pada pengguna aktif.
+3. **Checkout:** `GET /checkout` menampilkan rincian dan total. `POST /checkout`
+   memeriksa stok terbaru, membuat record pesanan, mengurangi stok, lalu
+   mengosongkan keranjang dalam transaksi database.
+4. **Konfirmasi WhatsApp:** setelah checkout, aplikasi membangun pesan berisi
+   nama, nomor pesanan, daftar barang, jumlah, dan total, lalu membuka tautan
+   `wa.me`. Atur `WHATSAPP_PHONE` pada `.env` dengan kode negara tanpa tanda plus
+   atau spasi, contohnya `6281234567890`. Jangan memasukkan nomor rahasia ke
+   source control. Jika belum diisi, WhatsApp terbuka dengan pesan dan pengguna
+   dapat memilih penerimanya.
+5. **Tampilan daftar produk:** instruksi menyebut `show.blade.php`, tetapi file
+   tersebut tidak ada pada project. Halaman katalog aktif adalah
+   `resources/views/product/description.blade.php`, yang sudah menampilkan
+   produk dari database sebagai daftar kartu. Perubahan tugas ini memakai
+   katalog aktif tersebut dan tidak membuat view `show` duplikat.
+6. **Invoice per checkout:** seluruh produk dalam satu checkout mendapat nomor
+   invoice yang sama dengan format `INV-YYYYMMDD-########`. Halaman riwayat
+   mengelompokkan semua baris produk berdasarkan invoice dan menyediakan
+   halaman detail beserta tombol konfirmasi WhatsApp.
+7. **Status dan pembatalan pesanan:** checkout berstatus `pending` karena aplikasi
+   belum bisa memverifikasi pembayaran atau pesan WhatsApp. User bisa membatalkan
+   invoice yang masih `pending`; seluruh item berubah menjadi `cancelled` dan stok
+   dikembalikan di dalam transaksi. Status `processing`/`completed` membutuhkan
+   verifikasi admin.
+8. **Riwayat pembelian:** halaman `GET /riwayat-pembelian` menampilkan invoice
+   yang tercatat setelah checkout. Query diambil dari relasi pengguna login,
+   sehingga pengguna hanya melihat invoice miliknya.
+9. **Profil pengguna:** halaman `/profile` menampilkan nama, email, tipe akun,
+   tanggal bergabung, dan jumlah item pesanan dalam layout toko. Pengguna tetap
+   dapat memperbarui nama/email, password, atau menghapus akun. Admin tetap
+   memakai layout admin pada halaman profil yang sama.
+10. **Navigasi akun:** pengguna login memiliki tautan Riwayat dan Profil.
+   Dashboard hanya muncul untuk admin.
+
+### Instruksi dashboard/klik (gambar keenam)
+
+Bagian ini sudah tersedia sebelum pengerjaan keranjang tugas 23 dan diverifikasi
+agar tidak dibuat dua kali:
+
+- Migration `2026_11_10_100000_add_click_count_to_products_table.php`
+  menambahkan kolom klik produk.
+- `ProductController::trackClick()` mencatat klik dan
+  `DashboardController::index()` mengambil jumlah produk, jumlah kategori, serta
+  total klik.
+- `resources/views/admin/dashboard.blade.php` menampilkan data tersebut;
+  `resources/js/app.js` menggambar grafik.
+- `tests/Feature/DashboardTest.php` memeriksa angka dashboard dan pencatatan klik.
+
+### File yang berubah untuk alur keranjang dan checkout
+
+- Migration `database/migrations/2026_11_11_164612_add_user_and_product_to_carts_table.php`.
+- Migration `database/migrations/2026_11_11_173000_add_invoice_number_to_orders_table.php`
+  menambahkan nomor invoice dan memberi nomor invoice pada pesanan lama.
+- Migration `database/migrations/2026_11_11_174000_add_status_to_orders_table.php`
+  menambahkan status invoice.
+- Migration `database/migrations/2026_11_11_174500_set_unverified_orders_to_pending.php`
+  mengoreksi status lama ke `pending`, karena aplikasi tidak memiliki bukti
+  pembayaran atau konfirmasi untuk menyatakan pesanan telah diproses.
+- Migration `database/migrations/2026_11_11_174600_add_payment_verification_to_orders_table.php`
+  menambahkan status pembayaran, waktu verifikasi, dan admin yang memverifikasi.
+- Dashboard admin menyediakan aksi verifikasi manual pembayaran. Aksi ini
+  mengubah status pembayaran menjadi `paid` dan status pesanan menjadi
+  `processing` untuk seluruh item invoice. Admin juga dapat membatalkan invoice
+  Pending dari dashboard. Riwayat dan detail invoice user menampilkan status
+  pembayaran, waktu, serta nama admin yang memverifikasi.
+- `app/Models/Cart.php` dan relasi keranjang di `app/Models/User.php`.
+- `app/Http/Controllers/CartController.php` serta
+  `app/Http/Controllers/CheckoutController.php`.
+- `app/Http/Controllers/OrderHistoryController.php` menyediakan riwayat yang
+  hanya dapat dibaca pemilik akun, halaman detail per invoice, dan pembatalan
+  pesanan pending beserta pemulihan stok.
+- `app/Models/Order.php` menyimpan nomor invoice dan status pada setiap baris
+  produk pesanan.
+- `app/Models/User.php` memiliki relasi `orders()` dan `cartItems()`.
+- `routes/web.php`, `resources/views/cart/index.blade.php`, dan
+  `resources/views/checkout/index.blade.php`.
+- `resources/views/purchases/index.blade.php` menampilkan riwayat pembelian;
+- `resources/views/purchases/show.blade.php` menampilkan seluruh item dan total
+  untuk satu invoice serta tombol pembatalan bila masih pending.
+- `resources/views/profile/edit.blade.php` memilih tampilan toko untuk pengguna
+  dan tampilan admin untuk admin.
+- `resources/views/components/navbar.blade.php` menampilkan jumlah item keranjang
+  pengguna yang sedang login.
+- `config/services.php` membaca pengaturan `WHATSAPP_PHONE`.
+- `tests/Feature/ShoppingCartTest.php` menguji pemisahan data antarpengguna,
+  perubahan keranjang, checkout, stok, dan tautan WhatsApp.
+- `tests/Feature/PurchaseHistoryTest.php` menguji riwayat, privasi pesanan,
+  profil, dan navigasi akun.
+
+### Jawaban singkat untuk ujian
+
+> Keranjang disimpan di database dan dihubungkan dengan user serta produk.
+> Controller mengambil item melalui relasi milik pengguna login, sehingga
+> keranjang pengguna lain tidak ikut terbaca. Saat checkout, aplikasi mengecek
+> stok di dalam transaksi, membuat satu nomor invoice untuk seluruh produk,
+> mengurangi stok, dan mengosongkan keranjang. Invoice berstatus Pending dapat
+> dibatalkan oleh pemiliknya; pembatalan mengembalikan stok dan mengubah status
+> seluruh item invoice menjadi Cancelled. Invoice tetap tersimpan dan bisa
+> dilihat kembali pada menu Riwayat.
+> Profil menampilkan informasi akun dan jumlah pesanan. Setelah checkout,
+> WhatsApp terbuka dengan rincian pesanan untuk dikonfirmasi.
+
+Verifikasi:
+
+```powershell
+php artisan migrate
+php artisan test --filter=ShoppingCartTest
+php artisan test --filter=PurchaseHistoryTest
+php artisan test --filter=DashboardTest
+```
+
+Jalankan migration satu kali setelah menarik perubahan agar tabel keranjang
+memiliki kolom pemilik, produk, jumlah, dan unique constraint per pengguna/produk.
+
+## 14. Pertanyaan latihan ujian
 
 **Apa bedanya route dan controller?**  
 Route menentukan request masuk ke aksi mana; controller menjalankan logika aksi.
@@ -452,9 +650,10 @@ Migration mengatur struktur tabel; seeder mengisi data awal/contoh.
 Supaya fitur administrasi tidak dapat dipakai pengunjung umum atau pengguna biasa.
 
 **Apakah keranjang disimpan di tabel `carts`?**  
-Belum. Implementasi `CartController` menyimpan keranjang di session.
+Ya. Setiap baris menyimpan pemilik, produk, dan jumlah. Query keranjang dibatasi
+ke akun yang sedang login.
 
-## 14. Cara membaca fitur baru
+## 15. Cara membaca fitur baru
 
 Untuk memahami atau menjelaskan fitur, ikuti urutan ini:
 
@@ -469,7 +668,7 @@ Untuk memahami atau menjelaskan fitur, ikuti urutan ini:
 Dengan urutan ini, alur sebuah fitur bisa dijelaskan dari request sampai
 response tanpa harus menghafal setiap baris kode.
 
-## 15. Peta file aplikasi lebih lengkap
+## 16. Peta file aplikasi lebih lengkap
 
 Bagian ini membantu mencari file saat belajar. File yang sudah dijelaskan
 sebelumnya tidak diulang dengan uraian panjang.
@@ -503,14 +702,20 @@ Request khusus:
   pengguna yang sudah login dan pengunjung.
 - `app/View/Components/ProductCard.php`: menerima data produk dan menampilkan
   komponen kartu produk.
-- `app/Models/Cart.php` dan `OrderItem.php`: file model tersedia, tetapi modelnya
-  masih kosong/minimal; lihat catatan implementasi yang belum lengkap.
+- `app/Models/Cart.php`: model item keranjang dengan relasi ke pengguna dan produk.
+- `app/Models/OrderItem.php`: masih model minimal; checkout saat ini menyimpan
+  satu baris per produk langsung di tabel `orders`.
 
 ### View yang sering dicari
 
 - `resources/views/home/index.blade.php`: beranda.
-- `resources/views/product/description.blade.php`: katalog produk.
+- `resources/views/product/description.blade.php`: katalog produk aktif; project
+  tidak memiliki `show.blade.php`.
 - `resources/views/cart/index.blade.php`: keranjang belanja.
+- `resources/views/checkout/index.blade.php`: ringkasan checkout dan tombol
+  konfirmasi pesanan melalui WhatsApp.
+- `resources/views/purchases/index.blade.php`: daftar riwayat pembelian milik
+  pengguna yang sedang login.
 - `resources/views/admin/dashboard.blade.php`: dashboard admin.
 - `resources/views/admin/products/index.blade.php`: tabel/daftar produk admin.
 - `resources/views/admin/products/form.blade.php`: halaman tambah/edit produk.
@@ -518,8 +723,8 @@ Request khusus:
 - `resources/views/admin/product_categories/index.blade.php`: daftar kategori admin.
 - `resources/views/admin/product_categories/form.blade.php`: halaman form kategori.
 - `resources/views/admin/product_categories/modal-form.blade.php`: versi modal form kategori.
-- `resources/views/profile/edit.blade.php`: halaman profil yang menggabungkan
-  bagian form profil.
+- `resources/views/profile/edit.blade.php`: halaman profil dengan tampilan
+  berbeda untuk pengguna toko dan admin.
 - `resources/views/profile/partials/update-profile-information-form.blade.php`:
   form nama dan email.
 - `resources/views/profile/partials/update-password-form.blade.php`: form ganti password.
@@ -552,6 +757,16 @@ File di `database/migrations/` berfungsi sebagai riwayat struktur database:
 - `2026_10_19_123147_create_order_items_table.php`: tabel item pesanan awal.
 - `2026_11_10_100000_add_click_count_to_products_table.php`: penghitung klik produk.
 - `2026_11_10_180000_add_role_to_users_table.php`: role pengguna.
+- `2026_11_11_164612_add_user_and_product_to_carts_table.php`: pemilik, produk,
+  jumlah, foreign key, dan unique constraint untuk item keranjang.
+- `2026_11_11_173000_add_invoice_number_to_orders_table.php`: nomor invoice
+  bersama untuk produk dalam checkout yang sama.
+- `2026_11_11_174000_add_status_to_orders_table.php`: status pesanan untuk
+  pembatalan dan grafik status dashboard.
+- `2026_11_11_174500_set_unverified_orders_to_pending.php`: memastikan pesanan
+  yang belum diverifikasi tidak keliru ditandai `processing`.
+- `2026_11_11_174600_add_payment_verification_to_orders_table.php`: status
+  pembayaran dan catatan waktu/admin verifikasi.
 
 `database/factories/UserFactory.php` membuat data pengguna untuk test. File
 `database/seeders/DatabaseSeeder.php`, `ProductCategorySeeder.php`, dan
@@ -561,7 +776,10 @@ File di `database/migrations/` berfungsi sebagai riwayat struktur database:
 
 - `tests/Feature/AdminCatalogTest.php`: pengelolaan produk dan kategori admin.
 - `tests/Feature/DashboardTest.php`: angka ringkasan, klik produk, dan data pesanan dashboard.
-- `tests/Feature/ShoppingCartTest.php`: katalog dan operasi keranjang.
+- `tests/Feature/ShoppingCartTest.php`: katalog, keranjang per pengguna, checkout,
+  stok, dan tautan WhatsApp.
+- `tests/Feature/PurchaseHistoryTest.php`: privasi riwayat, halaman profil akun,
+  tampilan kosong, navigasi pengguna, pembatalan invoice, dan pemulihan stok.
 - `tests/Feature/ProfileTest.php`: akses dashboard dan pengelolaan profil.
 - `tests/Feature/DatabaseSeederTest.php`: hasil data seeder.
 - `tests/Feature/Auth/AuthenticationTest.php`: login dan logout.
@@ -573,7 +791,7 @@ File di `database/migrations/` berfungsi sebagai riwayat struktur database:
 - `tests/Feature/ExampleTest.php` dan `tests/Unit/ExampleTest.php`: contoh test bawaan.
 - `tests/Pest.php` dan `tests/TestCase.php`: konfigurasi dasar Pest/PHPUnit.
 
-## 16. Catatan belajar file konfigurasi
+## 17. Catatan belajar file konfigurasi
 
 - `composer.json`: kebutuhan PHP/package dan script seperti `setup`, `dev`, dan `test`.
 - `package.json`: package frontend dan script `npm run dev` / `npm run build`.
@@ -586,6 +804,9 @@ File di `database/migrations/` berfungsi sebagai riwayat struktur database:
 - `config/filesystems.php`: disk penyimpanan file.
 - `config/logging.php`: tujuan dan level log.
 - `config/mail.php` dan `config/services.php`: email serta integrasi layanan.
+- `config/services.php` memuat `services.whatsapp.phone` dari `WHATSAPP_PHONE`.
+- Tambahkan `WHATSAPP_PHONE=6281234567890` ke `.env` lokal untuk mengarahkan
+  konfirmasi ke nomor toko; gunakan nomor toko yang benar dan jangan commit `.env`.
 - `postcss.config.js` dan `tailwind.config.js`: konfigurasi pipeline CSS.
 - `public/index.php` adalah pintu masuk request web; `artisan` adalah pintu masuk
   perintah terminal Laravel.
