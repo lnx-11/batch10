@@ -61,6 +61,7 @@
                                 <th scope="col" class="sticky left-0 z-10 whitespace-nowrap bg-gray-50 px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 shadow-[2px_0_6px_-3px_rgba(23,32,51,0.25)] sm:px-6">Invoice</th>
                                 <th scope="col" class="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 sm:px-6">Produk</th>
                                 <th scope="col" class="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 sm:px-6">Pelanggan</th>
+                                <th scope="col" class="min-w-64 px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 sm:px-6">Alamat Pengiriman</th>
                                 <th scope="col" class="whitespace-nowrap px-4 py-3 text-right text-xs font-semibold uppercase text-gray-500 sm:px-6">Jumlah</th>
                                 <th scope="col" class="whitespace-nowrap px-4 py-3 text-right text-xs font-semibold uppercase text-gray-500 sm:px-6">Total</th>
                                 <th scope="col" class="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 sm:px-6">Status</th>
@@ -75,6 +76,15 @@
                                     <td class="sticky left-0 z-10 whitespace-nowrap bg-white px-4 py-4 text-sm font-semibold text-gray-900 shadow-[2px_0_6px_-3px_rgba(23,32,51,0.25)] sm:px-6">{{ $invoice['invoice_number'] }}</td>
                                     <td class="min-w-48 px-4 py-4 text-sm text-gray-700 sm:px-6">{{ $invoice['product'] }}</td>
                                     <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-700 sm:px-6">{{ $invoice['customer'] }}</td>
+                                    <td class="min-w-64 px-4 py-4 text-sm text-gray-700 sm:px-6">
+                                        @if ($invoice['recipient_name'])
+                                            <span class="font-semibold">{{ $invoice['recipient_name'] }}</span><br>
+                                            {{ $invoice['recipient_phone'] }}<br>
+                                            {{ $invoice['shipping_address'] }}
+                                        @else
+                                            <span class="text-gray-500">Belum tersedia</span>
+                                        @endif
+                                    </td>
                                     <td class="whitespace-nowrap px-4 py-4 text-right text-sm text-gray-700 sm:px-6">{{ number_format($invoice['quantity']) }}</td>
                                     <td class="whitespace-nowrap px-4 py-4 text-right text-sm font-semibold text-gray-900 sm:px-6">Rp {{ number_format($invoice['total'], 0, ',', '.') }}</td>
                                     <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-700 sm:px-6">{{ $invoice['status'] }}</td>
@@ -111,7 +121,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="9" class="px-6 py-10 text-center text-sm text-gray-500">Belum ada pesanan pelanggan.</td>
+                                    <td colspan="10" class="px-6 py-10 text-center text-sm text-gray-500">Belum ada pesanan pelanggan.</td>
                                 </tr>
                             @endforelse
                         </tbody>

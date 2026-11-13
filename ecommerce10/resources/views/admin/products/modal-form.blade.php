@@ -26,7 +26,8 @@
     </div>
     <div>
         <x-input-label for="modal_product_description" value="Deskripsi" />
-        <textarea id="modal_product_description" name="description" rows="3" maxlength="5000" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" data-modal-field="description">{{ $product->description }}</textarea>
+        <textarea id="modal_product_description" name="description" rows="3" maxlength="1000" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" data-modal-field="description">{{ $product->description }}</textarea>
+        <p class="mt-1 text-sm text-gray-500">Maksimal 1.000 karakter.</p>
         <p class="mt-1 text-sm text-red-600" data-field-error="description"></p>
     </div>
     <div class="grid gap-4 sm:grid-cols-2">

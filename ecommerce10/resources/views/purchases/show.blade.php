@@ -45,6 +45,16 @@
         <div class="col-lg-4">
             <div class="cart-panel">
                 <h2 class="h5 fw-bold mb-3">Ringkasan invoice</h2>
+                @if ($orders->first()->recipient_name)
+                    <div class="mb-3">
+                        <h3 class="small fw-bold mb-1">Alamat pengiriman</h3>
+                        <p class="small text-secondary mb-0">
+                            {{ $orders->first()->recipient_name }}<br>
+                            {{ $orders->first()->recipient_phone }}<br>
+                            {{ $orders->first()->formattedShippingAddress() }}
+                        </p>
+                    </div>
+                @endif
                 <div class="d-flex justify-content-between text-secondary mb-3">
                     <span>Nomor invoice</span>
                     <span class="fw-semibold text-dark">{{ $invoiceNumber }}</span>

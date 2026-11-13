@@ -33,8 +33,10 @@ class ProductController extends Controller
     {
         $filters = $request->validate([
             'search' => ['nullable', 'string', 'max:100'],
+            'category_id' => ['nullable', 'integer', 'exists:product_categories,id'],
         ]);
         $search = trim($filters['search'] ?? '');
+        $categoryId = $filters['category_id'] ?? null;
         $categories = ProductCategory::query()
             ->orderBy('name')
             ->get();
@@ -47,11 +49,12 @@ class ProductController extends Controller
                         ->orWhere('description', 'like', '%'.$search.'%');
                 });
             })
+            ->when($categoryId, fn ($query, $id) => $query->where('product_category_id', $id))
             ->orderBy('id')
             ->paginate(6)
             ->withQueryString();
 
-        return view('product.description', compact('categories', 'products', 'search'));
+        return view('product.description', compact('categories', 'products', 'search', 'categoryId'));
     }
 
     public function trackClick(Product $product): JsonResponse
@@ -114,7 +117,7 @@ class ProductController extends Controller
         $validated = $request->validate([
             'product_category_id' => ['required', 'integer', 'exists:product_categories,id'],
             'name' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string', 'max:5000'],
+            'description' => ['required', 'string', 'max:1000'],
             'stock' => ['required', 'integer', 'min:0'],
             'price' => ['required', 'integer', 'min:0'],
             'image' => ['required', FileRule::image()->types(['jpg', 'jpeg', 'png', 'webp'])->max(2048), 'dimensions:min_width=100,min_height=100,max_width=2048,max_height=2048'],
@@ -157,7 +160,7 @@ class ProductController extends Controller
         $validated = $request->validate([
             'product_category_id' => ['required', 'integer', 'exists:product_categories,id'],
             'name' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string', 'max:5000'],
+            'description' => ['required', 'string', 'max:1000'],
             'stock' => ['required', 'integer', 'min:0'],
             'price' => ['required', 'integer', 'min:0'],
             'image' => ['nullable', FileRule::image()->types(['jpg', 'jpeg', 'png', 'webp'])->max(2048), 'dimensions:min_width=100,min_height=100,max_width=2048,max_height=2048'],

@@ -35,7 +35,8 @@
 
                 <div>
                     <x-input-label for="description" value="Deskripsi" />
-                    <textarea id="description" name="description" rows="4" maxlength="5000" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">{{ old('description', $product->description) }}</textarea>
+                    <textarea id="description" name="description" rows="4" maxlength="1000" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">{{ old('description', $product->description) }}</textarea>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Maksimal 1.000 karakter.</p>
                     <x-input-error :messages="$errors->get('description')" class="mt-2" />
                 </div>
 
@@ -74,9 +75,9 @@
                     <x-input-error :messages="$errors->get('image')" class="mt-2" />
                 </div>
 
-                <div class="flex items-center gap-3">
+                <div class="flex justify-end gap-3">
+                    <a href="{{ route('dashboard.products.index') }}" class="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:text-gray-300">Batal</a>
                     <x-primary-button>{{ $product->exists ? 'Simpan Perubahan' : 'Tambah Produk' }}</x-primary-button>
-                    <a href="{{ route('dashboard.products.index') }}" class="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300">Batal</a>
                 </div>
             </form>
         </div>

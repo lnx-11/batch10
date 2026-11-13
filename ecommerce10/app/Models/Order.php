@@ -25,6 +25,9 @@ class Order extends Model
     protected $fillable = [
         'invoice_number',
         'user_id',
+        'recipient_name',
+        'recipient_phone',
+        'shipping_address',
         'product_id',
         'quantity',
         'total',
@@ -59,5 +62,22 @@ class Order extends Model
     public function paymentVerifier(): BelongsTo
     {
         return $this->belongsTo(User::class, 'payment_verified_by');
+    }
+
+    public function formattedShippingAddress(): string
+    {
+        $address = trim((string) $this->shipping_address);
+
+        foreach ([$this->shipping_city, $this->shipping_province, $this->shipping_postal_code] as $part) {
+            $part = trim((string) $part);
+
+            if ($part === '' || ($address !== '' && stripos($address, $part) !== false)) {
+                continue;
+            }
+
+            $address = trim($address.', '.$part, ', ');
+        }
+
+        return $address;
     }
 }

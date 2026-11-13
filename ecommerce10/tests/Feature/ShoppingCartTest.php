@@ -2,6 +2,7 @@
 
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\ProductCategory;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -181,6 +182,13 @@ test('checkout shows the signed-in user cart total', function () {
     $this->get(route('checkout.index'))
         ->assertOk()
         ->assertSee('Periksa pesananmu.')
+        ->assertSee('Alamat pengiriman')
+        ->assertSee('name="recipient_name"', false)
+        ->assertSee('name="recipient_phone"', false)
+        ->assertSee('name="shipping_address"', false)
+        ->assertDontSee('name="shipping_city"', false)
+        ->assertSee('Kota Jakarta', false)
+        ->assertDontSee('Pekalongan')
         ->assertSee('Konfirmasi pesanan via WhatsApp')
         ->assertSee('class="btn btn-whatsapp w-100"', false)
         ->assertSee('class="whatsapp-icon"', false)
@@ -192,13 +200,18 @@ test('checkout creates orders reduces stock clears the cart and opens WhatsApp',
     $user = User::factory()->create(['name' => 'Pelanggan Checkout']);
     $product = Product::where('slug', 'headphone-studio-one')->firstOrFail();
     $anotherProduct = Product::where('slug', 'lampu-meja-arc')->firstOrFail();
+    $shippingDetails = [
+        'recipient_name' => 'Penerima Checkout',
+        'recipient_phone' => '081234567890',
+        'shipping_address' => 'Buaran, Kabupaten Pekalongan, Jawa Tengah, 51111',
+    ];
     $initialStock = $product->stock;
     $anotherInitialStock = $anotherProduct->stock;
     config(['services.whatsapp.phone' => '6281234567890']);
 
     $this->actingAs($user)->post(route('cart.store', $product));
     $this->post(route('cart.store', $anotherProduct));
-    $response = $this->post(route('checkout.store'));
+    $response = $this->post(route('checkout.store'), $shippingDetails);
 
     $response->assertRedirect();
     $invoiceNumber = Order::query()
@@ -208,6 +221,8 @@ test('checkout creates orders reduces stock clears the cart and opens WhatsApp',
         ->toContain('https://wa.me/6281234567890?text=')
         ->toContain(rawurlencode('No. invoice: '.$invoiceNumber))
         ->toContain(rawurlencode('Daftar produk:'))
+        ->toContain(rawurlencode('Nama penerima: '.$shippingDetails['recipient_name']))
+        ->toContain(rawurlencode('Alamat pengiriman: '.$shippingDetails['shipping_address']))
         ->toContain(rawurlencode('Lampu Meja Arc'));
     expect($invoiceNumber)->toMatch('/\AINV-\d{8}-\d{8}\z/');
     $this->assertDatabaseCount('orders', 2);
@@ -217,6 +232,7 @@ test('checkout creates orders reduces stock clears the cart and opens WhatsApp',
         'product_id' => $product->id,
         'quantity' => 1,
         'total' => $product->price,
+        ...$shippingDetails,
     ]);
     $this->assertDatabaseHas('orders', [
         'invoice_number' => $invoiceNumber,
@@ -225,7 +241,29 @@ test('checkout creates orders reduces stock clears the cart and opens WhatsApp',
         'quantity' => 1,
         'total' => $anotherProduct->price,
         'status' => 'pending',
+        ...$shippingDetails,
     ]);
+    Order::query()
+        ->where('invoice_number', $invoiceNumber)
+        ->update([
+            'shipping_city' => 'Pekalongan',
+            'shipping_province' => 'Jawa Tengah',
+            'shipping_postal_code' => '51111',
+        ]);
+    $this->get(route('purchases.show', $invoiceNumber))
+        ->assertOk()
+        ->assertSee($shippingDetails['recipient_name'])
+        ->assertSee($shippingDetails['recipient_phone'])
+        ->assertSee($shippingDetails['shipping_address'])
+        ->assertDontSee('Kabupaten Pekalongan, Pekalongan')
+        ->assertSee('Buaran, Kabupaten Pekalongan, Jawa Tengah, 51111');
+    $this->actingAs(User::factory()->admin()->create())
+        ->get(route('dashboard.orders.index'))
+        ->assertOk()
+        ->assertSee($shippingDetails['recipient_name'])
+        ->assertSee($shippingDetails['recipient_phone'])
+        ->assertSee('Buaran, Kabupaten Pekalongan, Jawa Tengah, 51111')
+        ->assertDontSee('Kabupaten Pekalongan, Pekalongan');
     $this->assertDatabaseMissing('carts', [
         'user_id' => $user->id,
         'product_id' => $product->id,
@@ -237,10 +275,15 @@ test('checkout creates orders reduces stock clears the cart and opens WhatsApp',
 test('checkout opens WhatsApp without a configured store number', function () {
     $user = User::factory()->create();
     $product = Product::where('slug', 'headphone-studio-one')->firstOrFail();
+    $shippingDetails = [
+        'recipient_name' => 'Penerima',
+        'recipient_phone' => '081234567890',
+        'shipping_address' => 'Jalan Melati No. 1, Bandung, Jawa Barat',
+    ];
     config(['services.whatsapp.phone' => null]);
 
     $this->actingAs($user)->post(route('cart.store', $product));
-    $response = $this->post(route('checkout.store'));
+    $response = $this->post(route('checkout.store'), $shippingDetails);
 
     $response->assertRedirect();
     expect($response->headers->get('Location'))->toContain('https://wa.me/?text=');
@@ -249,11 +292,16 @@ test('checkout opens WhatsApp without a configured store number', function () {
 test('checkout rejects a malformed configured WhatsApp number without creating an order', function () {
     $user = User::factory()->create();
     $product = Product::where('slug', 'headphone-studio-one')->firstOrFail();
+    $shippingDetails = [
+        'recipient_name' => 'Penerima',
+        'recipient_phone' => '081234567890',
+        'shipping_address' => 'Jalan Melati No. 1, Bandung, Jawa Barat',
+    ];
     config(['services.whatsapp.phone' => 'not-a-phone-number']);
 
     $this->actingAs($user)->post(route('cart.store', $product));
     $this->from(route('checkout.index'))
-        ->post(route('checkout.store'))
+        ->post(route('checkout.store'), $shippingDetails)
         ->assertRedirect(route('checkout.index'))
         ->assertSessionHas('error', 'Nomor WhatsApp toko belum dikonfigurasi dengan benar.');
 
@@ -271,14 +319,45 @@ test('checkout rejects a malformed configured WhatsApp number without creating a
 test('checkout keeps the cart when product stock is no longer sufficient', function () {
     $user = User::factory()->create();
     $product = Product::where('slug', 'headphone-studio-one')->firstOrFail();
+    $shippingDetails = [
+        'recipient_name' => 'Penerima',
+        'recipient_phone' => '081234567890',
+        'shipping_address' => 'Jalan Melati No. 1, Bandung, Jawa Barat',
+    ];
 
     $this->actingAs($user)->post(route('cart.store', $product));
     $product->update(['stock' => 0]);
 
     $this->from(route('checkout.index'))
-        ->post(route('checkout.store'))
+        ->post(route('checkout.store'), $shippingDetails)
         ->assertRedirect(route('cart.index'))
         ->assertSessionHas('error', 'Stok Headphone Studio One tidak mencukupi. Perbarui keranjang sebelum checkout.');
+
+    $this->assertDatabaseHas('carts', [
+        'user_id' => $user->id,
+        'product_id' => $product->id,
+        'quantity' => 1,
+    ]);
+    $this->assertDatabaseMissing('orders', [
+        'user_id' => $user->id,
+        'product_id' => $product->id,
+    ]);
+});
+
+test('checkout requires a complete shipping address and keeps the cart when it is invalid', function () {
+    $user = User::factory()->create();
+    $product = Product::where('slug', 'headphone-studio-one')->firstOrFail();
+
+    $this->actingAs($user)->post(route('cart.store', $product));
+    $this->from(route('checkout.index'))
+        ->post(route('checkout.store'), [
+            'recipient_name' => 'Penerima',
+            'recipient_phone' => '081234567890',
+        ])
+        ->assertRedirect(route('checkout.index'))
+        ->assertSessionHasErrors([
+            'shipping_address',
+        ]);
 
     $this->assertDatabaseHas('carts', [
         'user_id' => $user->id,
@@ -317,4 +396,25 @@ test('the catalog filters products by name or description', function () {
         ->assertDontSee('Kamera Pocket 35')
         ->assertSee('name="search"', false)
         ->assertSee('value="Headphone Studio One"', false);
+});
+
+test('catalog categories are clickable filters and can be combined with search', function () {
+    $technology = ProductCategory::where('slug', 'teknologi')->firstOrFail();
+
+    $this->get(route('products.index', ['category_id' => $technology->id]))
+        ->assertOk()
+        ->assertSee(route('products.index', ['category_id' => $technology->id]), false)
+        ->assertSee('name="category_id"', false)
+        ->assertSee('aria-current="true"', false)
+        ->assertSee('Headphone Studio One')
+        ->assertDontSee('Vas Bentuk Sora');
+
+    $this->get(route('products.index', [
+        'category_id' => $technology->id,
+        'search' => 'Headphone',
+    ]))
+        ->assertOk()
+        ->assertSee('Headphone Studio One')
+        ->assertDontSee('Kamera Pocket 35')
+        ->assertSee('value="Headphone"', false);
 });

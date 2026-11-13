@@ -103,7 +103,7 @@ No Livewire/Inertia/Flux package is installed. This app may be API-only. Confirm
 
 38. Framework: Pest (`it()` / `test()` / `expect()`) vs PHPUnit classes.
     - Hint: `ls tests/Pest.php`; grep `it(` / `test(` vs `extends TestCase`.
-39. DB reset: `RefreshDatabase` vs `DatabaseTruncation` vs `DatabaseMigrations`.
+39. DB  : `RefreshDatabase` vs `DatabaseTruncation` vs `DatabaseMigrations`.
     - Hint: grep those trait names in `tests/`.
 40. Fixtures: compare how equivalent test-owned records are created, such as factories vs manual inserts. Track seeders separately for shared reference data because `$this->seed()` commonly and legitimately coexists with factories.
     - Hint: grep `::factory(` and direct inserts in `tests/`; separately inspect `$this->seed(` calls and what those seeders provide.

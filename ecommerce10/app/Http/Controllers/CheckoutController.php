@@ -30,13 +30,18 @@ class CheckoutController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $user = $this->authenticatedUser($request);
+        $shippingDetails = $request->validate([
+            'recipient_name' => ['required', 'string', 'max:120'],
+            'recipient_phone' => ['required', 'string', 'max:30'],
+            'shipping_address' => ['required', 'string', 'max:2000'],
+        ]);
         $phone = trim((string) config('services.whatsapp.phone', ''));
 
         if ($phone !== '' && preg_match('/\A[1-9]\d{7,14}\z/', $phone) !== 1) {
             return back()->with('error', 'Nomor WhatsApp toko belum dikonfigurasi dengan benar.');
         }
 
-        $result = DB::transaction(function () use ($user): array {
+        $result = DB::transaction(function () use ($user, $shippingDetails): array {
             $cartItems = $user->cartItems()
                 ->orderBy('id')
                 ->lockForUpdate()
@@ -74,6 +79,7 @@ class CheckoutController extends Controller
                 $lineTotal = $product->price * $cartItem->quantity;
                 $order = Order::query()->create([
                     'user_id' => $user->id,
+                    ...$shippingDetails,
                     'product_id' => $product->id,
                     'quantity' => $cartItem->quantity,
                     'total' => $lineTotal,
@@ -111,7 +117,10 @@ class CheckoutController extends Controller
 
         $messageLines = [
             'Halo, saya ingin konfirmasi pesanan.',
-            'Nama: '.$user->name,
+            'Nama pemesan: '.$user->name,
+            'Nama penerima: '.$shippingDetails['recipient_name'],
+            'No. telepon penerima: '.$shippingDetails['recipient_phone'],
+            'Alamat pengiriman: '.$shippingDetails['shipping_address'],
             'No. invoice: '.$result['invoice_number'],
             'Daftar produk:',
         ];

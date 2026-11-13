@@ -6,6 +6,9 @@
             <div class="catalog-heading-controls d-flex flex-column flex-sm-row align-items-sm-center gap-2">
                 <form method="GET" action="{{ route('products.index') }}" class="catalog-search-form" role="search" data-catalog-search>
                     <label for="catalog-search" class="visually-hidden">Cari produk</label>
+                    @if ($categoryId)
+                        <input type="hidden" name="category_id" value="{{ $categoryId }}">
+                    @endif
                     <div class="input-group input-group-sm">
                         <input
                             id="catalog-search"
@@ -38,8 +41,13 @@
     <section class="mb-4" aria-label="Kategori produk">
         <h2 class="h6 fw-bold mb-2">Kategori produk</h2>
         <div class="d-flex flex-wrap gap-2">
+            <a href="{{ route('products.index', array_filter(['search' => $search])) }}" class="category-chip {{ $categoryId ? '' : 'active' }}" @if (! $categoryId) aria-current="true" @endif>Semua</a>
             @forelse ($categories as $category)
-                <span class="category-chip">{{ $category->name }}</span>
+                <a
+                    href="{{ route('products.index', array_filter(['search' => $search, 'category_id' => $category->id])) }}"
+                    class="category-chip {{ (int) $categoryId === $category->id ? 'active' : '' }}"
+                    @if ((int) $categoryId === $category->id) aria-current="true" @endif
+                >{{ $category->name }}</a>
             @empty
                 <span class="text-secondary small">Belum ada kategori produk.</span>
             @endforelse

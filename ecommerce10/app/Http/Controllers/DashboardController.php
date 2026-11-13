@@ -186,6 +186,9 @@ class DashboardController extends Controller
                     ->unique()
                     ->implode(', '),
                 'customer' => $firstOrder->user?->name ?? 'Pelanggan dihapus',
+                'recipient_name' => $firstOrder->recipient_name,
+                'recipient_phone' => $firstOrder->recipient_phone,
+                'shipping_address' => $firstOrder->formattedShippingAddress(),
                 'quantity' => $invoiceOrders->sum('quantity'),
                 'total' => $invoiceOrders->sum('total'),
                 'status' => ucfirst($firstOrder->status),

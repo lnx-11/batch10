@@ -197,10 +197,13 @@ Respons bisa berupa redirect untuk form biasa atau JSON untuk request AJAX.
 File: [`app/Http/Controllers/CheckoutController.php`](app/Http/Controllers/CheckoutController.php)
 
 - `index()`: menampilkan rincian dan total barang milik pengguna yang login.
-- `store()`: memeriksa stok terbaru, membuat baris pesanan, mengurangi stok,
-  mengosongkan keranjang, lalu membuka WhatsApp dengan pesan konfirmasi.
+- `store()`: memvalidasi nama dan nomor penerima serta alamat pengiriman,
+  memeriksa stok terbaru, membuat baris pesanan, mengurangi stok, mengosongkan
+  keranjang, lalu membuka WhatsApp dengan rincian pesanan dan alamat.
 - Seluruh perubahan database checkout dilakukan dalam satu transaksi agar
   pesanan, stok, dan keranjang tidak tertinggal dalam keadaan parsial.
+- Data penerima disimpan pada setiap baris invoice. Detail invoice milik user
+  dan halaman Orders admin menampilkan alamat untuk membantu proses pengiriman.
 
 Nomor tujuan WhatsApp dibaca dari `WHATSAPP_PHONE`. Isi dengan kode negara dan
 angka saja, misalnya `6281234567890`. Jika masih kosong, tautan WhatsApp tetap
@@ -515,11 +518,14 @@ php artisan test --filter=AdminCatalogTest
 2. **Ubah jumlah dan hapus:** tombol plus/minus mengirim perubahan ke route
    `cart.quantity`; tombol hapus ke `cart.remove`. Controller membatasi jumlah
    dengan stok produk, dan query selalu dibatasi pada pengguna aktif.
-3. **Checkout:** `GET /checkout` menampilkan rincian dan total. `POST /checkout`
-   memeriksa stok terbaru, membuat record pesanan, mengurangi stok, lalu
-   mengosongkan keranjang dalam transaksi database.
+3. **Checkout:** `GET /checkout` menampilkan rincian, total, serta form nama
+   penerima, nomor telepon, dan satu kolom alamat lengkap. Kota/kabupaten,
+   provinsi, serta kode pos dimasukkan di kolom alamat yang sama. `POST /checkout`
+   memvalidasi alamat sebelum memeriksa stok, membuat record pesanan, mengurangi
+   stok, lalu mengosongkan keranjang dalam transaksi database.
 4. **Konfirmasi WhatsApp:** setelah checkout, aplikasi membangun pesan berisi
-   nama, nomor pesanan, daftar barang, jumlah, dan total, lalu membuka tautan
+   nama pemesan/penerima, kontak dan alamat pengiriman, nomor pesanan, daftar
+   barang, jumlah, dan total, lalu membuka tautan
    `wa.me`. Atur `WHATSAPP_PHONE` pada `.env` dengan kode negara tanpa tanda plus
    atau spasi, contohnya `6281234567890`. Jangan memasukkan nomor rahasia ke
    source control. Jika belum diisi, WhatsApp terbuka dengan pesan dan pengguna
@@ -597,6 +603,8 @@ agar tidak dibuat dua kali:
   pembayaran atau konfirmasi untuk menyatakan pesanan telah diproses.
 - Migration `database/migrations/2026_11_11_174600_add_payment_verification_to_orders_table.php`
   menambahkan status pembayaran, waktu verifikasi, dan admin yang memverifikasi.
+- Migration `database/migrations/2026_11_13_000000_add_shipping_address_to_orders_table.php`
+  menambahkan data penerima dan alamat pengiriman pada pesanan.
 - Dashboard admin menyediakan aksi verifikasi manual pembayaran. Aksi ini
   mengubah status pembayaran menjadi `paid` dan status pesanan menjadi
   `processing` untuk seluruh item invoice. Admin juga dapat membatalkan invoice

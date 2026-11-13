@@ -93,8 +93,14 @@ test('admin can create update and delete a category', function () {
 });
 
 test('task route aliases for creating products and categories work', function () {
-    $this->get(route('product.create'))->assertOk();
-    $this->get(route('product-category.create'))->assertOk();
+    $this->get(route('product.create'))
+        ->assertOk()
+        ->assertSee('class="flex justify-end gap-3"', false)
+        ->assertSeeInOrder(['Batal</a>', 'Tambah Produk']);
+    $this->get(route('product-category.create'))
+        ->assertOk()
+        ->assertSee('class="flex justify-end gap-3"', false)
+        ->assertSeeInOrder(['Batal</a>', 'Tambah Kategori']);
 
     $this->post(route('product-category.store'), ['name' => 'Peralatan Tugas 21'])
         ->assertRedirect(route('dashboard.product-categories.index'));
@@ -197,6 +203,8 @@ test('admin can create a product with an image', function () {
     $this->get(route('dashboard.products.create'))
         ->assertOk()
         ->assertSee('data-modal-success="category-option"', false)
+        ->assertSee('maxlength="1000"', false)
+        ->assertSee('Maksimal 1.000 karakter.')
         ->assertSee('+ Kategori');
 
     $image = UploadedFile::fake()->createWithContent(
@@ -209,7 +217,7 @@ test('admin can create a product with an image', function () {
         $this->post(route('dashboard.products.store'), [
             'product_category_id' => ProductCategory::where('slug', 'teknologi')->value('id'),
             'name' => 'Produk Admin Baru',
-            'description' => 'Produk yang dibuat dari halaman admin.',
+            'description' => str_repeat('a', 1000),
             'stock' => 7,
             'price' => 125000,
             'image' => $image,
@@ -220,6 +228,7 @@ test('admin can create a product with an image', function () {
 
         expect($product->price)->toBe(125000)
             ->and($product->stock)->toBe(7)
+            ->and(strlen($product->description))->toBe(1000)
             ->and(File::exists(public_path($product->image)))->toBeTrue();
     } finally {
         if ($createdImagePath !== null) {
@@ -233,7 +242,7 @@ test('product validation rejects missing fields invalid values and invalid image
     $invalidProduct = [
         'product_category_id' => $categoryId,
         'name' => '',
-        'description' => str_repeat('a', 5001),
+        'description' => str_repeat('a', 1001),
         'stock' => -1,
         'price' => -1,
     ];
@@ -264,7 +273,7 @@ test('product update rejects invalid data without changing the existing product'
         ->put(route('dashboard.products.update', $product), [
             'product_category_id' => 999999,
             'name' => '',
-            'description' => str_repeat('a', 5001),
+            'description' => str_repeat('a', 1001),
             'stock' => -1,
             'price' => -1,
             'image' => UploadedFile::fake()->create('dokumen.pdf', 1, 'application/pdf'),

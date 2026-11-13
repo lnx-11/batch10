@@ -19,9 +19,9 @@
                     <x-input-error :messages="$errors->get('name')" class="mt-2" />
                 </div>
 
-                <div class="flex items-center gap-3">
+                <div class="flex justify-end gap-3">
+                    <a href="{{ route('dashboard.product-categories.index') }}" class="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:text-gray-300">Batal</a>
                     <x-primary-button>{{ $category->exists ? 'Simpan Perubahan' : 'Tambah Kategori' }}</x-primary-button>
-                    <a href="{{ route('dashboard.product-categories.index') }}" class="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300">Batal</a>
                 </div>
             </form>
         </div>
